@@ -17,6 +17,15 @@ class Kategori extends Model
         'kategori',
     ];
 
+    protected $appends = [
+        'nama_kategori',
+    ];
+
+    public function getNamaKategoriAttribute(): string
+    {
+        return $this->attributes['kategori'] ?? '';
+    }
+
     public function barang(): HasMany
     {
         return $this->hasMany(Barang::class, 'id_kategori', 'id_kategori');

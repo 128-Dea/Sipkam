@@ -32,6 +32,10 @@
                         <td>{{ $barang->kategori->nama_kategori ?? 'N/A' }}</td>
                     </tr>
                     <tr>
+                        <th>Stok</th>
+                        <td>{{ $barang->stok ?? 0 }}</td>
+                    </tr>
+                    <tr>
                         <th>Status</th>
                         <td>
                             <span class="badge bg-{{ $barang->status == 'tersedia' ? 'success' : 'warning' }}">

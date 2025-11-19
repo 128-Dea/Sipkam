@@ -22,7 +22,14 @@
                         <td>{{ $item->id_kategori }}</td>
                         <td>{{ $item->nama_kategori }}</td>
                         <td class="text-end">
-                            <a href="{{ route('kategori.edit', $item->id_kategori) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{{ route('kategori.edit', $item->id_kategori) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form action="{{ route('kategori.destroy', $item->id_kategori) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus kategori ini?')">
+                                    Hapus
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

@@ -22,6 +22,7 @@
                         <th>Nama</th>
                         <th>Kode</th>
                         <th>Kategori</th>
+                        <th>Stok</th>
                         <th>Status</th>
                         <th>Harga</th>
                         <th></th>
@@ -40,15 +41,23 @@
                             <td>{{ $item->nama_barang }}</td>
                             <td>{{ $item->kode_barang }}</td>
                             <td>{{ $item->kategori->nama_kategori ?? '-' }}</td>
+                            <td>{{ $item->stok ?? 0 }}</td>
                             <td>{{ ucfirst($item->status ?? 'tersedia') }}</td>
                             <td>Rp {{ number_format($item->harga ?? 0,0,',','.') }}</td>
                             <td class="text-end">
-                                <a href="{{ route('barang.edit', $item->id_barang ?? $item->id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{{ route('barang.edit', $item->id_barang) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                <form action="{{ route('barang.destroy', $item->id_barang) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus barang ini?')">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Belum ada barang.</td>
+                            <td colspan="8" class="text-center text-muted">Belum ada barang.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -73,6 +82,7 @@
                                 <p class="card-text">
                                     <small class="text-muted">
                                         Kode: {{ $item->kode_barang }}<br>
+                                        Stok: {{ $item->stok ?? 0 }}<br>
                                         Status: {{ $item->status ?? 'Tersedia' }}
                                     </small>
                                 </p>

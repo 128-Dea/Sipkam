@@ -26,8 +26,8 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Kode Barang</label>
-            <input type="text" name="kode_barang" value="{{ old('kode_barang') }}" class="form-control" required>
-            @error('kode_barang')<small class="text-danger">{{ $message }}</small>@enderror
+            <input type="text" class="form-control" value="Akan dibuat otomatis saat disimpan" disabled readonly>
+            <small class="text-muted d-block mt-1">Kode barang digenerate otomatis dengan format BRG-XXXX.</small>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -36,12 +36,9 @@
                 @error('harga')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                    <option value="tersedia" @selected(old('status')==='tersedia')>Tersedia</option>
-                    <option value="dipinjam" @selected(old('status')==='dipinjam')>Dipinjam</option>
-                    <option value="dalam_service" @selected(old('status')==='dalam_service')>Dalam Service</option>
-                </select>
+                <label class="form-label">Stok</label>
+                <input type="number" name="stok" value="{{ old('stok', 0) }}" class="form-control" min="0">
+                @error('stok')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
         <div class="mb-3">

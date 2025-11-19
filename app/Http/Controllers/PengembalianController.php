@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Denda;
 use App\Models\Peminjaman;
 use App\Models\Pengembalian;
 use App\Models\Riwayat;
@@ -21,7 +22,6 @@ class PengembalianController extends Controller
     {
         $peminjaman = Peminjaman::with('barang')
             ->whereDoesntHave('pengembalian')
-            ->whereHas('barang', fn ($query) => $query->where('status', 'dipinjam'))
             ->get();
 
         return view('pengembalian.create', compact('peminjaman'));
@@ -80,7 +80,14 @@ class PengembalianController extends Controller
             // Update status peminjaman dan barang
             $peminjaman->update(['status' => 'selesai']);
             if ($peminjaman->barang) {
-                $peminjaman->barang->update(['status' => 'tersedia']);
+                $peminjaman->barang->increment('stok');
+                $peminjaman->barang->refresh();
+
+                if (in_array($peminjaman->barang->status, ['tersedia', 'dipinjam'])) {
+                    $peminjaman->barang->update([
+                        'status' => $peminjaman->barang->stok > 0 ? 'tersedia' : 'dipinjam',
+                    ]);
+                }
             }
 
             Riwayat::create([

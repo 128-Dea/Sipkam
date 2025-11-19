@@ -36,14 +36,15 @@ class BarangController extends Controller
         $data = $request->validate([
             'id_kategori' => 'required|exists:kategori,id_kategori',
             'nama_barang' => 'required|string|max:100',
-            'kode_barang' => 'required|string|max:20',
+            'kode_barang' => 'nullable|string|max:20|unique:barang,kode_barang',
             'harga' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:tersedia,dipinjam,rusak,dalam_service',
+            'stok' => 'required|integer|min:0',
             'foto_barang' => 'nullable|image|max:2048',
         ]);
 
-        $data['status'] = $data['status'] ?? 'tersedia';
+        $data['kode_barang'] = ($data['kode_barang'] ?? null) ?: $this->generateKodeBarang();
         $data['harga'] = $data['harga'] ?? null;
+        $data['status'] = $data['stok'] > 0 ? 'tersedia' : 'dipinjam';
 
         if ($request->hasFile('foto_barang')) {
             $data['foto_path'] = $request->file('foto_barang')->store('barang', 'public');
@@ -74,14 +75,21 @@ class BarangController extends Controller
         $data = $request->validate([
             'id_kategori' => 'required|exists:kategori,id_kategori',
             'nama_barang' => 'required|string|max:100',
-            'kode_barang' => 'required|string|max:20',
+            'kode_barang' => 'nullable|string|max:20|unique:barang,kode_barang,' . $barang->id_barang . ',id_barang',
             'harga' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:tersedia,dipinjam,rusak,dalam_service',
+            'stok' => 'required|integer|min:0',
             'foto_barang' => 'nullable|image|max:2048',
         ]);
 
-        $data['status'] = $data['status'] ?? $barang->status;
+        $data['kode_barang'] = ($data['kode_barang'] ?? null) ?: ($barang->kode_barang ?? $this->generateKodeBarang());
         $data['harga'] = $data['harga'] ?? $barang->harga;
+        $data['stok'] = $data['stok'] ?? $barang->stok;
+
+        if (in_array($barang->status, ['tersedia', 'dipinjam'])) {
+            $data['status'] = $data['stok'] > 0 ? 'tersedia' : 'dipinjam';
+        } else {
+            $data['status'] = $barang->status;
+        }
 
         if ($request->hasFile('foto_barang')) {
             if ($barang->foto_path) {
@@ -104,5 +112,12 @@ class BarangController extends Controller
         $barang->delete();
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
+    }
+
+    private function generateKodeBarang(): string
+    {
+        $nextNumber = (Barang::max('id_barang') ?? 0) + 1;
+
+        return 'BRG-' . str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }

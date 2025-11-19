@@ -20,7 +20,7 @@ class PeminjamanController extends Controller
     public function create()
     {
         $pengguna = Pengguna::where('role', 'mahasiswa')->get();
-        $barang = Barang::where('status', 'tersedia')->get();
+        $barang = Barang::where('status', 'tersedia')->where('stok', '>', 0)->get();
 
         return view('peminjaman.create', compact('pengguna', 'barang'));
     }
@@ -34,9 +34,13 @@ class PeminjamanController extends Controller
             'alasan' => 'nullable|string',
         ]);
 
-        $barang = Barang::where('id_barang', $data['id_barang'])->where('status', 'tersedia')->firstOrFail();
+        $peminjaman = DB::transaction(function () use ($data) {
+            $barang = Barang::where('id_barang', $data['id_barang'])
+                ->where('status', 'tersedia')
+                ->where('stok', '>', 0)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        DB::transaction(function () use ($data, $barang) {
             $peminjaman = Peminjaman::create([
                 'id_pengguna' => auth()->id(),
                 'id_barang' => $data['id_barang'],
@@ -46,7 +50,13 @@ class PeminjamanController extends Controller
                 'status' => 'berlangsung',
             ]);
 
-            $barang->update(['status' => 'dipinjam']);
+            $barang->decrement('stok');
+            $barang->refresh();
+
+            if (in_array($barang->status, ['tersedia', 'dipinjam'])) {
+                $barang->status = $barang->stok > 0 ? 'tersedia' : 'dipinjam';
+                $barang->save();
+            }
 
             $qrCode = 'QR-PJM-' . uniqid();
 
@@ -55,6 +65,8 @@ class PeminjamanController extends Controller
                 'jenis_transaksi' => 'peminjaman',
                 'is_active' => true,
             ]);
+
+            return $peminjaman;
         });
 
         return redirect()->route('peminjaman.show', $peminjaman)->with('success', 'Peminjaman berhasil dibuat. QR Code telah dihasilkan.');
@@ -70,8 +82,15 @@ class PeminjamanController extends Controller
     public function destroy(Peminjaman $peminjaman)
     {
         DB::transaction(function () use ($peminjaman) {
-            if ($peminjaman->barang && $peminjaman->barang->status === 'dipinjam') {
-                $peminjaman->barang->update(['status' => 'tersedia']);
+            if ($peminjaman->barang) {
+                $peminjaman->barang->increment('stok');
+                $peminjaman->barang->refresh();
+
+                if (in_array($peminjaman->barang->status, ['tersedia', 'dipinjam'])) {
+                    $peminjaman->barang->update([
+                        'status' => $peminjaman->barang->stok > 0 ? 'tersedia' : 'dipinjam',
+                    ]);
+                }
             }
             $peminjaman->delete();
         });

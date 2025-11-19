@@ -22,10 +22,12 @@ class KategoriController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kategori' => 'required|string|max:50',
+            'nama_kategori' => 'required|string|max:50',
         ]);
 
-        Kategori::create($data);
+        Kategori::create([
+            'kategori' => $data['nama_kategori'],
+        ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
@@ -38,10 +40,12 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $kategori)
     {
         $data = $request->validate([
-            'kategori' => 'required|string|max:50',
+            'nama_kategori' => 'required|string|max:50',
         ]);
 
-        $kategori->update($data);
+        $kategori->update([
+            'kategori' => $data['nama_kategori'],
+        ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui');
     }

@@ -72,7 +72,11 @@ Route::middleware(['auth','role:petugas'])->group(function() {
     Route::resource('kategori', KategoriController::class);
     Route::resource('service', ServiceController::class);
     Route::resource('denda', DendaController::class);
-    Route::resource('pengembalian', PengembalianController::class)->only(['index']);
+    Route::resource('pengembalian', PengembalianController::class)->only(['index', 'create', 'store']);
+
+    Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('keluhan', KeluhanController::class)->only(['index', 'show']);
+    Route::resource('perpanjangan', PerpanjanganController::class)->only(['index', 'show', 'update']);
 
     Route::post('/perpanjangan/{id}/approve', [PerpanjanganController::class, 'approve'])->name('perpanjangan.approve');
     Route::post('/serahterima/{id}/approve', [SerahTerimaController::class, 'approve'])->name('serahterima.approve');

@@ -24,7 +24,8 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Kode Barang</label>
-            <input type="text" name="kode_barang" value="{{ old('kode_barang', $barang->kode_barang) }}" class="form-control" required>
+            <input type="text" name="kode_barang" value="{{ old('kode_barang', $barang->kode_barang) }}" class="form-control" readonly>
+            <small class="text-muted d-block mt-1">Kode barang tidak dapat diubah.</small>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -32,12 +33,9 @@
                 <input type="number" name="harga" value="{{ old('harga', $barang->harga) }}" class="form-control" min="0" step="1000">
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                    @foreach(['tersedia'=>'Tersedia','dipinjam'=>'Dipinjam','dalam_service'=>'Dalam Service'] as $value=>$label)
-                        <option value="{{ $value }}" @selected(old('status', $barang->status)==$value)>{{ $label }}</option>
-                    @endforeach
-                </select>
+                <label class="form-label">Stok</label>
+                <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}" class="form-control" min="0">
+                @error('stok')<small class="text-danger">{{ $message }}</small>@enderror
             </div>
         </div>
         <div class="mb-3">

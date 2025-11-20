@@ -29,8 +29,9 @@ class PengembalianController extends Controller
 
         // Filter supaya mahasiswa cuma lihat peminjaman miliknya
         if (auth()->user()->role === 'mahasiswa') {
-            $query->whereHas('pengguna', function ($q) {
-                $q->where('id_pengguna', auth()->id()); // sesuaikan jika primary key pengguna beda
+            $authPenggunaId = $this->resolveAuthPenggunaId();
+            $query->whereHas('pengguna', function ($q) use ($authPenggunaId) {
+                $q->where('id_pengguna', $authPenggunaId); // sesuaikan jika primary key pengguna beda
             });
         }
 
@@ -53,7 +54,7 @@ class PengembalianController extends Controller
 
         // Kalau mahasiswa, pastikan peminjaman itu milik dia
         if (auth()->user()->role === 'mahasiswa') {
-            if (!$peminjaman->pengguna || $peminjaman->pengguna->id !== auth()->id()) {
+            if (!$peminjaman->pengguna || $peminjaman->pengguna->id_pengguna !== $this->resolveAuthPenggunaId()) {
                 abort(403, 'Anda tidak boleh mengembalikan peminjaman milik orang lain.');
             }
         }
@@ -128,5 +129,33 @@ class PengembalianController extends Controller
         return redirect()
             ->route('petugas.pengembalian.index')
             ->with('success', 'Pengembalian berhasil diproses');
+    }
+
+    protected function resolveAuthPenggunaId(): ?int
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return null;
+        }
+
+        $pengguna = \App\Models\Pengguna::find($user->id);
+
+        if (!$pengguna && $user->email) {
+            $pengguna = \App\Models\Pengguna::where('email', $user->email)->first();
+        }
+
+        if (!$pengguna) {
+            $nomorHp = $user->phone ?? $user->nomor_hp ?? '0';
+            $pengguna = new \App\Models\Pengguna();
+            $pengguna->id_pengguna = $user->id;
+            $pengguna->nama = $user->name ?? 'Pengguna';
+            $pengguna->email = $user->email;
+            $pengguna->nomor_hp = $nomorHp;
+            $pengguna->role = $user->role ?? 'mahasiswa';
+            $pengguna->save();
+        }
+
+        return $pengguna->id_pengguna;
     }
 }

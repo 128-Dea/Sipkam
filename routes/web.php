@@ -58,6 +58,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
         Route::resource('notifikasi', NotifikasiController::class)->only(['index']);
         Route::get('/qr/{id}', [QrController::class, 'show'])->name('qr.show');
         Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+        Route::get('/riwayat/{riwayat}', [RiwayatController::class, 'show'])->name('riwayat.show');
 
         // >>> PENGEMBALIAN: MAHASISWA BISA CREATE & STORE <<<
         Route::resource('pengembalian', PengembalianController::class)->only(['create', 'store']);

@@ -34,7 +34,7 @@ class PerpanjanganController extends Controller
         $peminjaman = Peminjaman::findOrFail($data['id_peminjaman']);
 
         // Pastikan hanya pemilik peminjaman yang bisa mengajukan perpanjangan
-        if ($peminjaman->id_pengguna !== auth()->id()) {
+        if ($peminjaman->id_pengguna !== $this->resolveAuthPenggunaId()) {
             return back()->withErrors(['id_peminjaman' => 'Anda tidak memiliki akses untuk memperpanjang peminjaman ini.']);
         }
 
@@ -56,5 +56,33 @@ class PerpanjanganController extends Controller
         $routeScope = auth()->user()?->role === 'petugas' ? 'petugas' : 'mahasiswa';
 
         return redirect()->route($routeScope . '.perpanjangan.index')->with('success', 'Status perpanjangan diperbarui');
+    }
+
+    protected function resolveAuthPenggunaId(): ?int
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return null;
+        }
+
+        $pengguna = \App\Models\Pengguna::find($user->id);
+
+        if (!$pengguna && $user->email) {
+            $pengguna = \App\Models\Pengguna::where('email', $user->email)->first();
+        }
+
+        if (!$pengguna) {
+            $nomorHp = $user->phone ?? $user->nomor_hp ?? '0';
+            $pengguna = new \App\Models\Pengguna();
+            $pengguna->id_pengguna = $user->id;
+            $pengguna->nama = $user->name ?? 'Pengguna';
+            $pengguna->email = $user->email;
+            $pengguna->nomor_hp = $nomorHp;
+            $pengguna->role = $user->role ?? 'mahasiswa';
+            $pengguna->save();
+        }
+
+        return $pengguna->id_pengguna;
     }
 }

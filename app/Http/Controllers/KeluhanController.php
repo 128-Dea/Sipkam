@@ -29,6 +29,8 @@ class KeluhanController extends Controller
 
     public function store(Request $request)
     {
+        $authPenggunaId = $this->resolveAuthPenggunaId();
+
         $data = $request->validate([
             'id_peminjaman' => 'required|exists:peminjaman,id_peminjaman',
             'keluhan' => 'required|string',
@@ -38,7 +40,7 @@ class KeluhanController extends Controller
         $peminjaman = Peminjaman::findOrFail($data['id_peminjaman']);
 
         // Pastikan hanya pemilik peminjaman yang bisa membuat keluhan
-        if ($peminjaman->id_pengguna !== auth()->id()) {
+        if ($authPenggunaId === null || $peminjaman->id_pengguna !== $authPenggunaId) {
             return back()->withErrors(['id_peminjaman' => 'Anda tidak memiliki akses untuk membuat keluhan pada peminjaman ini.']);
         }
 
@@ -48,7 +50,7 @@ class KeluhanController extends Controller
 
         $keluhan = DB::transaction(function () use ($data) {
             return Keluhan::create([
-                'id_pengguna' => auth()->id(),
+                'id_pengguna' => $this->resolveAuthPenggunaId(),
                 'id_peminjaman' => $data['id_peminjaman'],
                 'keluhan' => $data['keluhan'],
                 'foto_path' => $data['foto_path'] ?? null,
@@ -68,10 +70,38 @@ class KeluhanController extends Controller
     public function show(Keluhan $keluhan)
     {
         // Pastikan hanya pemilik keluhan atau petugas yang bisa melihat detail
-        if (auth()->user()->role === 'mahasiswa' && $keluhan->id_pengguna !== auth()->id()) {
+        if (auth()->user()->role === 'mahasiswa' && $keluhan->id_pengguna !== $this->resolveAuthPenggunaId()) {
             abort(403, 'Anda tidak memiliki akses untuk melihat keluhan ini.');
         }
 
         return view('keluhan.show', compact('keluhan'));
+    }
+
+    protected function resolveAuthPenggunaId(): ?int
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return null;
+        }
+
+        $pengguna = Pengguna::find($user->id);
+
+        if (!$pengguna && $user->email) {
+            $pengguna = Pengguna::where('email', $user->email)->first();
+        }
+
+        if (!$pengguna) {
+            $nomorHp = $user->phone ?? $user->nomor_hp ?? '0';
+            $pengguna = new Pengguna();
+            $pengguna->id_pengguna = $user->id;
+            $pengguna->nama = $user->name ?? 'Pengguna';
+            $pengguna->email = $user->email;
+            $pengguna->nomor_hp = $nomorHp;
+            $pengguna->role = $user->role ?? 'mahasiswa';
+            $pengguna->save();
+        }
+
+        return $pengguna->id_pengguna;
     }
 }

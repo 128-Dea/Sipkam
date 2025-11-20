@@ -17,12 +17,15 @@
             </thead>
             <tbody>
                 @forelse($riwayat as $item)
+                    @php
+                        $peminjaman = $item->pengembalian->peminjaman ?? null;
+                    @endphp
                     <tr>
-                        <td>{{ $item->id_peminjaman }}</td>
-                        <td>{{ $item->barang->nama_barang ?? '-' }}</td>
-                        <td>{{ ucfirst($item->status) }}</td>
-                        <td>{{ \Carbon\Carbon::parse($item->waktu_awal)->format('d M Y') }}</td>
-                        <td><a href="{{ route('riwayat.show', $item->id_peminjaman) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
+                        <td>{{ $item->id_riwayat }}</td>
+                        <td>{{ $peminjaman->barang->nama_barang ?? '-' }}</td>
+                        <td>{{ ucfirst($peminjaman->status ?? '-') }}</td>
+                        <td>{{ optional($peminjaman?->waktu_awal ? \Carbon\Carbon::parse($peminjaman->waktu_awal) : null)->format('d M Y') }}</td>
+                        <td><a href="{{ route('mahasiswa.riwayat.show', $item->id_riwayat) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
                     </tr>
                 @empty
                     <tr>

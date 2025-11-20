@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Pengguna;
 use App\Models\Peminjaman;
 use App\Models\Qr;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ class PeminjamanController extends Controller
             ->orderByDesc('waktu_awal');
 
         if ($user && $user->role === 'mahasiswa') {
-            $query->where('id_pengguna', $user->id);
+            $penggunaId = $this->resolvePenggunaId($user);
+            if ($penggunaId) {
+                $query->where('id_pengguna', $penggunaId);
+            }
         }
 
         $peminjaman = $query->get();
@@ -53,8 +57,10 @@ class PeminjamanController extends Controller
             'alasan'      => 'nullable|string',
         ]);
 
+        $pengguna = $this->ensurePengguna($user);
+
         $peminjaman = Peminjaman::create([
-            'id_pengguna' => $user->id,
+            'id_pengguna' => $pengguna?->id_pengguna,
             'id_barang'   => $data['id_barang'],
             'waktu_awal'  => $data['waktu_awal'],
             'waktu_akhir' => $data['waktu_akhir'],
@@ -80,7 +86,7 @@ class PeminjamanController extends Controller
     {
         $user = auth()->user();
 
-        if ($user && $user->role === 'mahasiswa' && $peminjaman->id_pengguna !== $user->id) {
+        if ($user && $user->role === 'mahasiswa' && $peminjaman->id_pengguna !== $this->resolvePenggunaId($user)) {
             abort(403);
         }
 
@@ -125,5 +131,36 @@ class PeminjamanController extends Controller
         } elseif (in_array($barang->status, ['tersedia', 'dipinjam'])) {
             $barang->update(['status' => 'dipinjam']);
         }
+    }
+
+    protected function ensurePengguna($user): ?Pengguna
+    {
+        if (!$user) {
+            return null;
+        }
+
+        $pengguna = Pengguna::find($user->id);
+
+        if (!$pengguna && $user->email) {
+            $pengguna = Pengguna::where('email', $user->email)->first();
+        }
+
+        if (!$pengguna) {
+            $nomorHp = $user->phone ?? $user->nomor_hp ?? '0';
+            $pengguna = new Pengguna();
+            $pengguna->id_pengguna = $user->id;
+            $pengguna->nama = $user->name ?? 'Pengguna';
+            $pengguna->email = $user->email;
+            $pengguna->nomor_hp = $nomorHp;
+            $pengguna->role = $user->role ?? 'mahasiswa';
+            $pengguna->save();
+        }
+
+        return $pengguna;
+    }
+
+    protected function resolvePenggunaId($user): ?int
+    {
+        return $this->ensurePengguna($user)?->id_pengguna;
     }
 }

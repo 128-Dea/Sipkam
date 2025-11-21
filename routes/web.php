@@ -65,7 +65,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
     });
 
 
-//| Petugas
+// | Petugas
 
 Route::middleware(['auth', 'role:petugas'])
     ->prefix('petugas')
@@ -78,8 +78,14 @@ Route::middleware(['auth', 'role:petugas'])
         Route::resource('service', ServiceController::class);
         Route::resource('denda', DendaController::class);
 
-        // >>> PETUGAS HANYA BISA LIHAT PENGEMBALIAN (INDEX) <<<
-        Route::resource('pengembalian', PengembalianController::class)->only(['index']);
+        // Route tambahan untuk proses pengembalian via QR
+Route::get('pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
+Route::get('pengembalian/scan', [PengembalianController::class, 'scanForm'])->name('pengembalian.scan');
+Route::post('pengembalian/scan', [PengembalianController::class, 'handleScan'])->name('pengembalian.handleScan');
+Route::get('pengembalian/{peminjaman}/konfirmasi', [PengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
+Route::post('pengembalian/{peminjaman}/tanpa-kerusakan', [PengembalianController::class, 'prosesTanpaKerusakan'])->name('pengembalian.tanpaKerusakan');
+Route::get('pengembalian/{peminjaman}/kerusakan', [PengembalianController::class, 'formKerusakan'])->name('pengembalian.formKerusakan');
+Route::post('pengembalian/{peminjaman}/kerusakan', [PengembalianController::class, 'prosesDenganKerusakan'])->name('pengembalian.prosesKerusakan');
 
         Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
         Route::resource('keluhan', KeluhanController::class)->only(['index', 'show']);

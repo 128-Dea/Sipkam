@@ -52,7 +52,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
 
         Route::resource('peminjaman', PeminjamanController::class);
         Route::resource('keluhan', KeluhanController::class)->except(['edit', 'update', 'destroy']);
-        Route::resource('perpanjangan', PerpanjanganController::class);
+        Route::resource('perpanjangan', PerpanjanganController::class)->only(['index', 'create', 'store', 'update']);
         Route::resource('notifikasi', NotifikasiController::class)->only(['index']);
         Route::get('/qr/{id}', [QrController::class, 'show'])->name('qr.show');
         Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
@@ -85,6 +85,9 @@ Route::middleware(['auth', 'role:petugas'])
         // Modul service (petugas.service.*)
         Route::resource('service', ServiceController::class)->only(['index', 'update']);
 
+        // Perpanjangan untuk persetujuan petugas
+        Route::resource('perpanjangan', PerpanjanganController::class)->only(['index', 'update']);
+
         // Denda (sesuai punyamu sekarang)
         Route::resource('denda', DendaController::class)->except(['create', 'store']);
 
@@ -92,11 +95,8 @@ Route::middleware(['auth', 'role:petugas'])
         Route::get('pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
         Route::get('pengembalian/scan', [PengembalianController::class, 'scanForm'])->name('pengembalian.scan');
         Route::post('pengembalian/scan', [PengembalianController::class, 'handleScan'])->name('pengembalian.handleScan');
-<<<<<<< Updated upstream
-        Route::post('pengembalian/{peminjaman}/proses', [PengembalianController::class, 'prosesLengkap'])->name('pengembalian.prosesLengkap');
-=======
->>>>>>> Stashed changes
-        Route::get('pengembalian/{peminjaman}/konfirmasi', [PengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
+Route::post('pengembalian/{peminjaman}/proses', [PengembalianController::class, 'prosesLengkap'])->name('pengembalian.prosesLengkap');
+Route::get('pengembalian/{peminjaman}/konfirmasi', [PengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
         Route::post('pengembalian/{peminjaman}/tanpa-kerusakan', [PengembalianController::class, 'prosesTanpaKerusakan'])->name('pengembalian.tanpaKerusakan');
         Route::get('pengembalian/{peminjaman}/kerusakan', [PengembalianController::class, 'formKerusakan'])->name('pengembalian.formKerusakan');
         Route::post('pengembalian/{peminjaman}/kerusakan', [PengembalianController::class, 'prosesDenganKerusakan'])->name('pengembalian.prosesKerusakan');

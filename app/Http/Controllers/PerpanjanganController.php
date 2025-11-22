@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Peminjaman;
 use App\Models\Perpanjangan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class PerpanjanganController extends Controller
 {
@@ -38,11 +40,40 @@ class PerpanjanganController extends Controller
             return back()->withErrors(['id_peminjaman' => 'Anda tidak memiliki akses untuk memperpanjang peminjaman ini.']);
         }
 
-        $data['status_persetujuan'] = 'menunggu';
+        $requestedEnd = Carbon::parse($data['waktu_perpanjangan']);
+        $currentEnd   = Carbon::parse($peminjaman->waktu_akhir);
 
-        Perpanjangan::create($data);
+        if ($requestedEnd->lessThanOrEqualTo($currentEnd)) {
+            return back()->withErrors(['waktu_perpanjangan' => 'Waktu perpanjangan harus lebih lama dari waktu kembali saat ini.'])->withInput();
+        }
 
-        return redirect()->route('mahasiswa.perpanjangan.index')->with('success', 'Permohonan perpanjangan berhasil dikirim');
+        // Cek konflik jadwal pada barang yang sama selama periode perpanjangan
+        $conflictExists = Peminjaman::where('id_barang', $peminjaman->id_barang)
+            ->where('id_peminjaman', '!=', $peminjaman->id_peminjaman)
+            ->where('status', 'berlangsung')
+            ->where('waktu_awal', '<', $requestedEnd)
+            ->where('waktu_akhir', '>', $currentEnd)
+            ->exists();
+
+        $data['status_persetujuan'] = $conflictExists ? 'ditolak' : 'disetujui';
+
+        DB::transaction(function () use ($data, $peminjaman, $requestedEnd, $conflictExists) {
+            Perpanjangan::create($data);
+
+            // Jika tidak ada konflik, langsung setujui dan perbarui akhir peminjaman
+            if (!$conflictExists) {
+                $peminjaman->update([
+                    'waktu_akhir' => $requestedEnd,
+                    'status' => $peminjaman->status, // tidak mengubah status berjalan
+                ]);
+            }
+        });
+
+        $message = $conflictExists
+            ? 'Perpanjangan ditolak otomatis karena jadwal bentrok dengan peminjaman lain.'
+            : 'Perpanjangan disetujui otomatis karena jadwal kosong.';
+
+        return redirect()->route('mahasiswa.perpanjangan.index')->with('success', $message);
     }
 
     public function update(Request $request, Perpanjangan $perpanjangan)

@@ -10,7 +10,7 @@
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <h5 class="fw-semibold mb-1">Edit Profil</h5>
-                <small class="text-muted">Perbarui nama dan email Anda</small>
+                <small class="text-muted">Perbarui nama dan nomor telepon. Email tidak dapat diubah.</small>
 
                 @if (session('status') === 'profile-updated')
                     <div class="alert alert-success mt-3">Profil berhasil diperbarui.</div>
@@ -30,8 +30,21 @@
 
                     <div class="mb-3">
                         <label class="form-label form-label-modern" for="email">Email</label>
-                        <input type="email" class="form-control form-control-modern @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                        @error('email')
+                        <input type="email" class="form-control form-control-modern" id="email" value="{{ $user->email }}" disabled>
+                        <div class="form-text">Email terverifikasi dan tidak dapat diubah.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label form-label-modern" for="phone">Nomor Telepon</label>
+                        <input
+                            type="tel"
+                            class="form-control form-control-modern @error('phone') is-invalid @enderror"
+                            id="phone"
+                            name="phone"
+                            value="{{ old('phone', $user->phone ?? $user->nomor_hp) }}"
+                            required
+                        >
+                        @error('phone')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

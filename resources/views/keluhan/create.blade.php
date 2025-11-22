@@ -282,10 +282,10 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Foto Bukti Keluhan (Opsional)</label>
-                    <input type="file" name="foto_keluhan" class="form-control" accept="image/*">
+                    <label class="form-label">Lampiran Bukti (Foto/Video - Opsional)</label>
+                    <input type="file" name="foto_keluhan" class="form-control" accept="image/*,video/*">
                     <small class="text-muted d-block mt-1">
-                        Format JPG, PNG, atau WEBP maksimal 2MB. Upload foto sebagai bukti keluhan.
+                        Format gambar (JPG, PNG, WEBP) atau video (MP4, MOV, WEBM) maks 20MB.
                     </small>
                     @error('foto_keluhan')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>

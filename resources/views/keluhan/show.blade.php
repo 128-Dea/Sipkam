@@ -8,10 +8,22 @@
     <div class="col-md-8">
         <h1 class="mb-4">Detail Keluhan #{{ $keluhan->id_keluhan }}</h1>
 
+        @php
+            $isVideo = $keluhan->foto_url
+                && \Illuminate\Support\Str::of($keluhan->foto_url)->lower()->contains(['.mp4', '.mov', '.avi', '.webm']);
+        @endphp
+
         @if($keluhan->foto_url)
             <div class="mb-4">
-                <h5>Foto Bukti Keluhan</h5>
-                <img src="{{ $keluhan->foto_url }}" alt="Foto keluhan" class="img-fluid rounded" style="max-height: 400px; object-fit: cover;">
+                <h5>Lampiran Bukti Keluhan</h5>
+                @if($isVideo)
+                    <video controls class="w-100 rounded border" style="max-height: 400px;">
+                        <source src="{{ $keluhan->foto_url }}">
+                        Browser tidak mendukung pemutar video.
+                    </video>
+                @else
+                    <img src="{{ $keluhan->foto_url }}" alt="Lampiran keluhan" class="img-fluid rounded" style="max-height: 400px; object-fit: cover;">
+                @endif
             </div>
         @endif
 

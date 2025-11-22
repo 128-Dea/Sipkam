@@ -705,6 +705,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('petugas.perpanjangan.*') ? 'active' : '' }}" href="{{ route('petugas.perpanjangan.index') }}">
+                            <i class="fas fa-clock"></i>
+                            <span>Perpanjangan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('petugas.keluhan.*') ? 'active' : '' }}" href="{{ route('petugas.keluhan.index') }}">
                             <i class="fas fa-exclamation-triangle"></i>
                             <span>Keluhan</span>
@@ -854,9 +860,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('mahasiswa.pengembalian.*') ? 'active' : '' }}" href="{{ route('mahasiswa.pengembalian.create') }}">
-                            <i class="fas fa-undo"></i>
-                            <span>Pengembalian</span>
+                        <a class="nav-link {{ request()->routeIs('mahasiswa.perpanjangan.*') ? 'active' : '' }}" href="{{ route('mahasiswa.perpanjangan.index') }}">
+                            <i class="fas fa-clock"></i>
+                            <span>Perpanjangan</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -869,12 +875,6 @@
                         <a class="nav-link {{ request()->routeIs('mahasiswa.riwayat.*') ? 'active' : '' }}" href="{{ route('mahasiswa.riwayat.index') }}">
                             <i class="fas fa-history"></i>
                             <span>Riwayat</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('profile.show') ? 'active' : '' }}" href="{{ route('profile.show') }}">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
                         </a>
                     </li>
                     <li class="nav-item">

@@ -40,7 +40,7 @@ class KeluhanController extends Controller
         $data = $request->validate([
             'id_peminjaman' => 'required|exists:peminjaman,id_peminjaman',
             'keluhan' => 'required|string',
-            'foto_keluhan' => 'nullable|image|max:2048',
+            'foto_keluhan' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,webm|max:20480', // gambar atau video
         ]);
 
         $peminjaman = Peminjaman::findOrFail($data['id_peminjaman']);

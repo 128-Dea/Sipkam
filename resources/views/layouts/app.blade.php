@@ -542,6 +542,120 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
         }
+
+        /* === DARK MODE GLOBAL (TAMBAHAN) === */
+        :root {
+            --sipkam-bg-light: #f3f4f6;
+            --sipkam-bg-dark: #020617;
+            --sipkam-text-dark: #0f172a;
+            --sipkam-text-dark-mode: #e5e7eb;
+            --sipkam-muted-dark: #9ca3af;
+            --sipkam-accent-green: #22c55e;
+        }
+
+        body.sipkam-light {
+            background: var(--sipkam-bg-light);
+            color: var(--sipkam-text-dark);
+        }
+
+        body.sipkam-dark {
+            background: var(--sipkam-bg-dark);
+            color: var(--sipkam-text-dark-mode);
+        }
+
+        /* sidebar & top nav */
+        body.sipkam-dark .top-nav {
+            background-color: #020617 !important;
+            border-bottom-color: #111827 !important;
+            color: var(--sipkam-text-dark-mode);
+            box-shadow: 0 10px 25px rgba(0,0,0,.9);
+        }
+
+        body.sipkam-dark .navbar-brand,
+        body.sipkam-dark .top-nav .text-primary {
+            color: var(--sipkam-accent-green) !important;
+        }
+
+        body.sipkam-dark .sidebar-modern {
+            background: #020617 !important;
+            box-shadow: 0 0 0 rgba(0,0,0,.9);
+        }
+
+        body.sipkam-dark .sidebar-modern .nav-link {
+            color: var(--sipkam-muted-dark);
+        }
+
+        body.sipkam-dark .sidebar-modern .nav-link.active,
+        body.sipkam-dark .sidebar-modern .nav-link:hover {
+            background: var(--sipkam-accent-green);
+            color: #020617;
+        }
+
+        /* cards & tables */
+        body.sipkam-dark .card-modern,
+        body.sipkam-dark .stats-card,
+        body.sipkam-dark .table-modern {
+            background-color: #020617 !important;
+            color: var(--sipkam-text-dark-mode);
+            border-color: #111827 !important;
+            box-shadow: 0 18px 40px rgba(0,0,0,.75);
+        }
+
+        body.sipkam-dark .card-modern .card-header {
+            background: #020617;
+            color: var(--sipkam-accent-green);
+            border-bottom: 1px solid #111827;
+        }
+
+        body.sipkam-dark .table-modern thead th {
+            background: #020617;
+            color: var(--sipkam-accent-green);
+        }
+
+        body.sipkam-dark .card {
+            background-color: #020617;
+            color: var(--sipkam-text-dark-mode);
+            border-color: #111827;
+        }
+
+        body.sipkam-dark .table {
+            color: var(--sipkam-text-dark-mode);
+        }
+
+        body.sipkam-dark .table thead th {
+            border-color: #1f2937;
+        }
+
+        body.sipkam-dark .table tbody td {
+            border-color: #111827;
+        }
+
+        /* link & breadcrumb */
+        body.sipkam-dark a,
+        body.sipkam-dark .nav-link,
+        body.sipkam-dark .breadcrumb-item a {
+            color: var(--sipkam-accent-green);
+        }
+
+        /* alerts */
+        body.sipkam-dark .alert-modern {
+            background: #020617;
+            color: var(--sipkam-text-dark-mode);
+            border: 1px solid #111827;
+        }
+
+        /* outline buttons */
+        body.sipkam-dark .btn-outline-primary,
+        body.sipkam-dark .btn-outline-secondary {
+            border-color: var(--sipkam-accent-green);
+            color: var(--sipkam-accent-green);
+        }
+
+        /* avatar circle */
+        body.sipkam-dark .avatar-circle {
+            background: var(--sipkam-accent-green);
+            color: #020617;
+        }
     </style>
 </head>
 <body>
@@ -1011,6 +1125,20 @@
             }
         `;
         document.head.appendChild(style);
+    </script>
+
+    {{-- SCRIPT TAMBAHAN: baca tema dari localStorage & apply ke body --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('sipkam-theme');
+            const prefersDark = window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            const initialTheme = savedTheme || (prefersDark ? 'sipkam-dark' : 'sipkam-light');
+
+            document.body.classList.remove('sipkam-light', 'sipkam-dark');
+            document.body.classList.add(initialTheme);
+        });
     </script>
 </body>
 </html>

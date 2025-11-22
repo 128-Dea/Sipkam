@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,7 @@ class KeluhanController extends Controller
         $status = $request->query('status');
 
         $keluhan = Keluhan::with(['pengguna', 'peminjaman.barang', 'service'])
-            ->when($status, fn($q) => $q->where('status', $status))
+            ->when($status && Schema::hasColumn('keluhan', 'status'), fn($q) => $q->where('status', $status))
             ->orderByDesc('id_keluhan')
             ->get();
 

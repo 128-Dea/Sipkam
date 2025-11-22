@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Service;
 
 class Barang extends Model
 {
@@ -51,11 +52,6 @@ class Barang extends Model
         return $this->hasMany(Notifikasi::class, 'id_barang', 'id_barang');
     }
 
-    public function service(): HasMany
-    {
-        return $this->hasMany(Service::class, 'id_barang', 'id_barang');
-    }
-
     // ====== ACCESSOR FOTO ======
 
     public function getFotoUrlAttribute(): ?string
@@ -79,8 +75,10 @@ class Barang extends Model
      // Banyak unit yang sedang dalam service (status service = 'service').
     public function getStokServiceAttribute(): int
     {
-        return (int) $this->service()
-            ->where('status', 'service')                    
+        return (int) Service::where('status', 'service')
+            ->whereHas('keluhan.peminjaman', function ($q) {
+                $q->where('id_barang', $this->id_barang);
+            })
             ->count();
     }
 

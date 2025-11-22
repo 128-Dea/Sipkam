@@ -702,7 +702,7 @@
                     <i class="fas fa-graduation-cap"></i>
                     <div class="logo-text">
                         <h5>SIPKAM</h5>
-                        <small>Sistem Peminjaman</small>
+                        <small>Sistem Peminjaman Kampus</small>
                     </div>
                 </div>
             </div>
@@ -870,6 +870,7 @@
                     <i class="fas fa-graduation-cap"></i>
                     <div class="logo-text">
                         <h5>SIPKAM</h5>
+                        <small>Sistem Peminjaman Kampus</small>
                     </div>
                 </div>
             </div>

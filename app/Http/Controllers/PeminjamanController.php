@@ -36,6 +36,7 @@ class PeminjamanController extends Controller
         abort_unless($user && $user->role === 'petugas', 403);
 
         $booking = Peminjaman::with(['barang', 'pengguna', 'qr'])
+            ->whereIn('status', ['booking', 'ditolak'])
             ->orderByDesc('waktu_awal')
             ->get();
 
@@ -117,6 +118,47 @@ class PeminjamanController extends Controller
         return redirect()
             ->route('petugas.peminjaman.index')
             ->with('success', 'Peminjaman berhasil dihapus.');
+    }
+
+    /**
+     * Aktifkan peminjaman dari hasil scan QR (petugas).
+     * Mengubah status booking => berlangsung (aktif).
+     */
+    public function activateFromScan(Request $request)
+    {
+        $user = auth()->user();
+        abort_unless($user && $user->role === 'petugas', 403);
+
+        $data = $request->validate([
+            'qr_code' => 'required|string',
+        ]);
+
+        $kodeTransaksi = $data['qr_code'];
+        $decoded = json_decode($kodeTransaksi, true);
+        if (is_array($decoded) && isset($decoded['kode_transaksi'])) {
+            $kodeTransaksi = $decoded['kode_transaksi'];
+        }
+
+        $qr = Qr::with('peminjaman')
+            ->where('qr_code', $kodeTransaksi)
+            ->where('jenis_transaksi', 'peminjaman')
+            ->where('is_active', true)
+            ->first();
+
+        if (!$qr || !$qr->peminjaman) {
+            return response()->json(['message' => 'QR tidak valid atau peminjaman tidak ditemukan'], 422);
+        }
+
+        $peminjaman = $qr->peminjaman;
+
+        if ($peminjaman->status === 'booking') {
+            $peminjaman->update(['status' => 'berlangsung']);
+        }
+
+        return response()->json([
+            'message' => 'Peminjaman diaktifkan',
+            'status'  => $peminjaman->status,
+        ]);
     }
 
     protected function generateQrCode(int $id): string

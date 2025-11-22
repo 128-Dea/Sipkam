@@ -362,6 +362,16 @@
                         found = true;
                     }
                 });
+
+                fetch('{{ route('petugas.peminjaman.activate') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ qr_code: qrCode }),
+                }).catch(err => console.error('Aktivasi gagal', err));
+
                 return found;
             }
 

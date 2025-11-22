@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $filters = $filters ?? ['from' => null, 'to' => null, 'kondisi' => null, 'search' => null];
+    $filters = $filters ?? ['kondisi' => null, 'search' => null];
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
@@ -20,15 +20,7 @@
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body">
         <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label form-label-modern">Dari</label>
-                <input type="date" id="filter-from" class="form-control form-control-modern" value="{{ $filters['from'] }}">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label form-label-modern">Sampai</label>
-                <input type="date" id="filter-to" class="form-control form-control-modern" value="{{ $filters['to'] }}">
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-6 col-lg-3">
                 <label class="form-label form-label-modern">Kondisi</label>
                 <select id="filter-kondisi" class="form-select form-control-modern">
                     <option value="">Semua</option>
@@ -37,7 +29,7 @@
                     <option value="hilang" {{ $filters['kondisi']==='hilang' ? 'selected' : '' }}>🔴 Hilang</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6 col-lg-3">
                 <label class="form-label form-label-modern">Cari Mahasiswa / Barang</label>
                 <input type="text" id="filter-search" class="form-control form-control-modern" value="{{ $filters['search'] }}" placeholder="ketik nama atau barang">
             </div>
@@ -159,8 +151,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         const params = new URLSearchParams(window.location.search);
         const inputs = {
-            from: document.getElementById('filter-from'),
-            to: document.getElementById('filter-to'),
             kondisi: document.getElementById('filter-kondisi'),
             search: document.getElementById('filter-search'),
         };
@@ -171,8 +161,6 @@
         });
 
         function applyFilters() {
-            params.set('from', inputs.from.value || '');
-            params.set('to', inputs.to.value || '');
             params.set('kondisi', inputs.kondisi.value || '');
             params.set('search', inputs.search.value || '');
             const query = params.toString().replace(/(&?[^=]*=)(?=&|$)/g, '');

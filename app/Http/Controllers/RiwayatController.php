@@ -11,17 +11,31 @@ class RiwayatController extends Controller
 {
     public function index()
     {
+        $userId = auth()->id();
+
         $riwayat = Riwayat::with([
                 'pengembalian.peminjaman.pengguna',
                 'pengembalian.peminjaman.barang',
                 'pengembalian.peminjaman.denda',
-            ])->orderByDesc('id_riwayat')->get();
+            ])
+            ->whereHas('pengembalian.peminjaman', function ($q) use ($userId) {
+                $q->where('id_pengguna', $userId);
+            })
+            ->orderByDesc('id_riwayat')
+            ->get();
 
         return view('riwayat.index', compact('riwayat'));
     }
 
     public function show(Riwayat $riwayat)
     {
+        $userId = auth()->id();
+
+        // Batasi akses detail riwayat hanya untuk pemilik atau petugas
+        if (auth()->user()->role === 'mahasiswa' && optional($riwayat->pengembalian->peminjaman)->id_pengguna !== $userId) {
+            abort(403);
+        }
+
         $riwayat->load(['pengembalian.peminjaman.pengguna', 'pengembalian.peminjaman.barang', 'pengembalian.peminjaman.denda']);
 
         return view('riwayat.show', compact('riwayat'));
@@ -35,8 +49,6 @@ class RiwayatController extends Controller
         $pengembalian = $this->queryHistory($request)->get();
 
         $filters = [
-            'from'     => $request->query('from'),
-            'to'       => $request->query('to'),
             'kondisi'  => $request->query('kondisi'),
             'search'   => $request->query('search'),
         ];
@@ -104,12 +116,6 @@ class RiwayatController extends Controller
             ])
             ->whereHas('peminjaman', function ($q) {
                 $q->where('status', 'selesai');
-            })
-            ->when($request->query('from'), function ($q, $from) {
-                $q->whereDate('waktu_pengembalian', '>=', $from);
-            })
-            ->when($request->query('to'), function ($q, $to) {
-                $q->whereDate('waktu_pengembalian', '<=', $to);
             })
             ->when($request->query('kondisi'), function ($q, $kondisi) {
                 $q->whereHas('peminjaman.barang', function ($qq) use ($kondisi) {

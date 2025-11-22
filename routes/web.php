@@ -102,6 +102,7 @@ Route::get('pengembalian/{peminjaman}/konfirmasi', [PengembalianController::clas
         Route::post('pengembalian/{peminjaman}/kerusakan', [PengembalianController::class, 'prosesDenganKerusakan'])->name('pengembalian.prosesKerusakan');
 
         Route::get('booking', [PeminjamanController::class, 'booking'])->name('booking.index');
+        Route::post('peminjaman/activate-scan', [PeminjamanController::class, 'activateFromScan'])->name('peminjaman.activate');
         Route::resource('peminjaman', PeminjamanController::class)->only(['index', 'show', 'destroy']);
         Route::resource('keluhan', KeluhanController::class)->only(['index', 'show']);
         Route::post('keluhan/{keluhan}/service', [KeluhanController::class, 'kirimService'])->name('keluhan.service');

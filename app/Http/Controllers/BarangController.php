@@ -16,7 +16,7 @@ class BarangController extends Controller
         $user = auth()->user();
 
         // Relasi dimuat supaya perhitungan stok otomatis tidak N+1 query
-        $query = Barang::with(['kategori', 'peminjaman', 'service']);
+        $query = Barang::with(['kategori', 'peminjaman']);
 
         // Pencarian nama / kode barang
         if ($search = $request->input('q')) {
@@ -85,7 +85,7 @@ class BarangController extends Controller
 
     public function show(Barang $barang)
     {
-        $barang->load(['kategori', 'peminjaman', 'service']);
+        $barang->load(['kategori', 'peminjaman']);
 
         return view('barang.show', compact('barang'));
     }

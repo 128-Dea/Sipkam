@@ -22,7 +22,8 @@ class PeminjamanController extends Controller
         if ($user && $user->role === 'mahasiswa') {
             $penggunaId = $this->resolvePenggunaId($user);
             if ($penggunaId) {
-                $query->where('id_pengguna', $penggunaId);
+                $query->where('id_pengguna', $penggunaId)
+                    ->where('status', '!=', 'selesai');
             }
         }
 

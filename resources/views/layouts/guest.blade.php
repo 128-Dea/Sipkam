@@ -110,6 +110,60 @@
             font-weight: 500;
         }
 
+        .splash-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15), transparent 35%),
+                        radial-gradient(circle at 80% 30%, rgba(79, 70, 229, 0.15), transparent 30%),
+                        linear-gradient(135deg, #f1f5ff 0%, #e4ebff 50%, #f1f5ff 100%);
+            z-index: 2000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: grid;
+            place-items: center;
+            box-shadow: var(--shadow-lg);
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        .splash-logo i {
+            font-size: 2.75rem;
+            color: white;
+        }
+
+        .splash-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            color: var(--text-primary);
+        }
+
+        .splash-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.25); }
+            50% { transform: scale(1.04); box-shadow: 0 0 0 12px rgba(99, 102, 241, 0.08); }
+        }
+
         .auth-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -280,6 +334,16 @@
     </style>
 </head>
 <body>
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="text-center">
+            <div class="splash-title">SIPKAM</div>
+            <div class="splash-subtitle">Sistem Peminjaman Kampus</div>
+        </div>
+    </div>
+
     <div class="floating-shapes">
         <div class="shape"></div>
         <div class="shape"></div>
@@ -352,6 +416,20 @@
                     }
                 });
             });
+        });
+
+        // Splash screen handling
+        window.addEventListener('load', function() {
+            const splash = document.getElementById('splash-screen');
+            if (!splash) return;
+
+            setTimeout(() => {
+                splash.classList.add('fade-out');
+            }, 650);
+
+            splash.addEventListener('transitionend', () => {
+                splash.style.display = 'none';
+            }, { once: true });
         });
     </script>
 </body>

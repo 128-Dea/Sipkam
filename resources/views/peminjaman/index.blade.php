@@ -340,39 +340,55 @@
                 });
             }
 
-            function markAsScanned(qrCode) {
-                if (!qrCode) return false;
-                let kodeTransaksi = qrCode;
+            function normalizeQr(qr) {
+                if (!qr) return '';
                 try {
-                    const parsed = JSON.parse(qrCode);
+                    const parsed = JSON.parse(qr);
                     if (parsed?.kode_transaksi) {
-                        kodeTransaksi = parsed.kode_transaksi;
+                        return parsed.kode_transaksi;
                     }
-                } catch (e) {
-                    // plain string, keep as is
-                }
-                let found = false;
+                } catch (_) {}
+                return qr;
+            }
+
+            async function markAsScanned(qrCode) {
+                if (!qrCode) return false;
+                const kodeTransaksi = normalizeQr(qrCode);
+
                 document.querySelectorAll('[data-aktif-row]').forEach(row => {
-                    if (row.getAttribute('data-qr') === kodeTransaksi) {
+                    if (normalizeQr(row.getAttribute('data-qr')) === kodeTransaksi) {
                         const chip = row.querySelector('.status-chip');
                         if (chip) {
                             chip.className = 'badge bg-success status-chip';
                             chip.textContent = 'Dipinjam';
                         }
-                        found = true;
                     }
                 });
 
-                fetch('{{ route('petugas.peminjaman.activate') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify({ qr_code: qrCode }),
-                }).catch(err => console.error('Aktivasi gagal', err));
+                try {
+                    const response = await fetch('{{ route('petugas.peminjaman.activate') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify({ qr_code: qrCode }),
+                    });
 
-                return found;
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.message || 'QR tidak valid.');
+                    }
+
+                    localStorage.setItem('sipkam-activated-qr', kodeTransaksi);
+                    showToast('Scan berhasil. Booking dipindah ke Peminjaman aktif.', 'success');
+                    setTimeout(() => window.location.reload(), 450);
+                    return true;
+                } catch (err) {
+                    console.error('Aktivasi gagal', err);
+                    showToast(err.message || 'Aktivasi gagal.', 'danger');
+                    return false;
+                }
             }
 
             scanBtn?.addEventListener('click', () => {
@@ -382,13 +398,12 @@
                     return;
                 }
 
-                const ok = markAsScanned(qrCode);
-                if (ok) {
-                    showToast('QR valid. Status berubah menjadi Dipinjam.', 'success');
-                } else {
-                    showToast('QR tidak ditemukan pada daftar aktif.', 'danger');
-                }
-                scanInput.value = '';
+                markAsScanned(qrCode).then(ok => {
+                    if (!ok) {
+                        showToast('QR tidak ditemukan atau belum terdaftar.', 'danger');
+                    }
+                    scanInput.value = '';
+                });
             });
 
             document.querySelectorAll('.btn-scan-attach').forEach(btn => {

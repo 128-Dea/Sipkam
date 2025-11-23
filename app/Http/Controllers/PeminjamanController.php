@@ -78,7 +78,7 @@ class PeminjamanController extends Controller
             'waktu_awal'  => $data['waktu_awal'],
             'waktu_akhir' => $data['waktu_akhir'],
             'alasan'      => $data['alasan'] ?? '',
-            'status'      => 'berlangsung',
+            'status'      => 'booking',
         ]);
 
         $this->updateBarangSetelahPinjam($peminjaman->barang);

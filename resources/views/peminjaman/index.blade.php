@@ -67,7 +67,7 @@
                         </div>
                         <div>
                             <div class="fw-semibold">Scan QR Mahasiswa</div>
-                            <small class="text-muted">Validasi sebelum serah terima</small>
+                            <small class="text-muted">Validasi sebelum aktivasi peminjaman</small>
                         </div>
                     </div>
                     <div class="mb-3">

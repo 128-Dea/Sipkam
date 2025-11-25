@@ -335,7 +335,6 @@ class PengembalianController extends Controller
             // Simpan ke tabel riwayat
             Riwayat::create([
                 'id_pengembalian' => $pengembalian->id_pengembalian,
-                'serah_terima'    => $totalDenda > 0 ? 'ya' : 'tidak',
                 'denda'           => $totalDenda,
             ]);
         });

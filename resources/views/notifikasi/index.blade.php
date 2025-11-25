@@ -10,7 +10,9 @@
                 <div>
                     <h6 class="mb-1">{{ $item->judul ?? 'Notifikasi' }}</h6>
                     <p class="mb-1">{{ $item->pesan ?? '-' }}</p>
-                    <small class="text-muted">Barang: {{ $item->barang->nama_barang ?? '-' }} | Pengguna: {{ $item->pengguna->nama ?? '-' }}</small>
+                    @if(auth()->user()?->role !== 'petugas')
+                        <small class="text-muted">Barang: {{ $item->barang->nama_barang ?? '-' }} | Pengguna: {{ $item->pengguna->nama ?? '-' }}</small>
+                    @endif
                 </div>
                 <form action="{{ route((auth()->user()?->role === 'petugas' ? 'petugas.notifikasi.destroy' : 'mahasiswa.notifikasi.destroy'), $item->id_notifikasi) }}" method="POST" onsubmit="return confirm('Hapus notifikasi ini?');">
                     @csrf

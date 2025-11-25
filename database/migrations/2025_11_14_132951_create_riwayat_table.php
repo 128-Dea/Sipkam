@@ -12,7 +12,6 @@ return new class extends Migration
         Schema::create('riwayat', function (Blueprint $table) {
             $table->increments('id_riwayat');
             $table->unsignedInteger('id_pengembalian');
-            $table->enum('serah_terima', ['ya', 'tidak'])->default('tidak');
             $table->decimal('denda', 10, 2);
 
             $table->foreign('id_pengembalian')

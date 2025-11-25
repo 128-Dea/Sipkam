@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedInteger('id_barang');
             $table->unsignedInteger('id_pengguna');
             $table->text('pesan');
-            $table->enum('jenis', ['perpanjangan', 'denda', 'serah_terima']);
+            $table->enum('jenis', ['perpanjangan', 'denda']);
 
             $table->foreign('id_barang')
                 ->references('id_barang')

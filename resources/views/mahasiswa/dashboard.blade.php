@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @php($statistik = $statistik ?? [])
+@php($statistikSekunder = $statistikSekunder ?? [])
 @php($aktivitas = $aktivitas ?? [])
 @php($barangDipinjam = $barangDipinjam ?? collect())
 @php($riwayatSelesai = $statistik['selesai'] ?? 0)
-@php($aktif = $statistik['aktif'] ?? 0)
-@php($menunggu = $statistik['menunggu'] ?? 0)
-@php($keluhanDiajukan = $statistik['keluhan'] ?? ($statistik['keluhan_diajukan'] ?? 0))
-@php($totalDenda = $statistik['total_denda'] ?? 0)
-@php($totalPeminjaman = $statistik['total'] ?? ($aktif + $menunggu + $riwayatSelesai))
+@php($peminjamanAktif = $statistik['aktif'] ?? 0)
+@php($totalPeminjaman = $statistikSekunder['total_peminjaman'] ?? ($statistik['total'] ?? $riwayatSelesai))
+@php($keluhanDiajukan = $statistikSekunder['total_keluhan'] ?? ($statistik['keluhan'] ?? ($statistik['keluhan_diajukan'] ?? 0)))
+@php($totalDenda = $statistikSekunder['total_denda'] ?? ($statistik['total_denda'] ?? 0))
 @php($persentaseSelesai = $totalPeminjaman > 0 ? number_format(($riwayatSelesai / $totalPeminjaman) * 100, 0) : 0)
 
 @section('content')
@@ -257,6 +257,22 @@
         background: rgba(248, 250, 252, 0.98);
         box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
     }
+    .stat-overview .head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+    .stat-overview .icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.05);
+        font-size: .9rem;
+    }
     .stat-overview .label {
         font-size: .78rem;
         text-transform: uppercase;
@@ -273,6 +289,10 @@
         background: #020617;
         border: 1px solid rgba(31, 41, 55, 0.95);
         box-shadow: 0 14px 32px rgba(0, 0, 0, 0.8);
+    }
+    body.sipkam-dark .stat-overview .icon {
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--sipkam-accent-green);
     }
 
     /* ====== MINI CARD / SHORTCUT ====== */
@@ -462,74 +482,6 @@
         </div>
     </div>
 
-    {{-- STATISTIK --}}
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-modern h-100 border-0 stat-card">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="label">Riwayat Selesai</span>
-                            <span class="stat-pill stat-pill-selesai">Selesai</span>
-                        </div>
-                        <div class="value">{{ $riwayatSelesai }}</div>
-                    </div>
-                    <div class="ms-3">
-                        <i class="fas fa-check-double fa-2x text-success"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-modern h-100 border-0 stat-card">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="label">Total Peminjaman</span>
-                            <span class="stat-pill stat-pill-aktif">Total</span>
-                        </div>
-                        <div class="value">{{ $totalPeminjaman }}</div>
-                    </div>
-                    <div class="ms-3">
-                        <i class="fas fa-hand-holding fa-2x text-primary"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-modern h-100 border-0 stat-card">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="label">Keluhan Diajukan</span>
-                            <span class="stat-pill stat-pill-menunggu">Keluhan</span>
-                        </div>
-                        <div class="value">{{ $keluhanDiajukan }}</div>
-                    </div>
-                    <div class="ms-3">
-                        <i class="fas fa-comments fa-2x text-warning"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-modern h-100 border-0 stat-card">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="label">Total Denda</span>
-                            <span class="stat-pill stat-pill-selesai">IDR</span>
-                        </div>
-                        <div class="value">Rp {{ number_format($totalDenda, 0, ',', '.') }}</div>
-                    </div>
-                    <div class="ms-3">
-                        <i class="fas fa-wallet fa-2x text-danger"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- REKAP STATISTIK --}}
     <div class="row mb-4">
         <div class="col-12">
@@ -549,19 +501,38 @@
                 <div class="card-body">
                     <div class="stat-overview mb-3">
                         <div class="item">
-                            <span class="label">Riwayat selesai</span>
+                            <div class="head">
+                                <span class="label">Riwayat selesai</span>
+                                <span class="icon text-success"><i class="fas fa-check-double"></i></span>
+                            </div>
                             <span class="value text-success">{{ $riwayatSelesai }}</span>
                         </div>
                         <div class="item">
-                            <span class="label">Total peminjaman</span>
+                            <div class="head">
+                                <span class="label">Total peminjaman</span>
+                                <span class="icon text-primary"><i class="fas fa-hand-holding"></i></span>
+                            </div>
                             <span class="value text-primary">{{ $totalPeminjaman }}</span>
                         </div>
                         <div class="item">
-                            <span class="label">Keluhan diajukan</span>
+                            <div class="head">
+                                <span class="label">Peminjaman aktif</span>
+                                <span class="icon text-info"><i class="fas fa-bolt"></i></span>
+                            </div>
+                            <span class="value text-info">{{ $peminjamanAktif }}</span>
+                        </div>
+                        <div class="item">
+                            <div class="head">
+                                <span class="label">Keluhan diajukan</span>
+                                <span class="icon text-warning"><i class="fas fa-comments"></i></span>
+                            </div>
                             <span class="value text-warning">{{ $keluhanDiajukan }}</span>
                         </div>
                         <div class="item">
-                            <span class="label">Total denda</span>
+                            <div class="head">
+                                <span class="label">Total denda</span>
+                                <span class="icon text-danger"><i class="fas fa-wallet"></i></span>
+                            </div>
                             <span class="value text-danger">Rp {{ number_format($totalDenda, 0, ',', '.') }}</span>
                         </div>
                     </div>

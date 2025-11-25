@@ -40,20 +40,8 @@
             @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
-        <!-- Remember Me & Forgot Password -->
-        <div class="mb-4 d-flex justify-content-between align-items-center">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="1" id="remember_me" name="remember">
-                <label class="form-check-label text-muted small" for="remember_me">
-                    <i class="fas fa-clock me-1"></i>Ingat saya
-                </label>
-            </div>
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="text-decoration-none small text-primary fw-semibold">
-                    <i class="fas fa-key me-1"></i>Lupa password?
-                </a>
-            @endif
-        </div>
+        <!-- Spacing before submit -->
+        <div class="mb-4"></div>
 
         <!-- Tombol Login -->
         <div class="d-grid mb-3">
@@ -142,8 +130,7 @@
                     <hr>
                     <div class="alert alert-info small mb-0">
                         <i class="fas fa-lightbulb me-2"></i>
-                        <strong>Tips:</strong> Jika lupa password, klik "Lupa password?" untuk reset.
-                        Untuk bantuan lebih lanjut, hubungi admin sistem.
+                        <strong>Tips:</strong> Untuk bantuan lebih lanjut, hubungi admin sistem.
                     </div>
                 </div>
             </div>

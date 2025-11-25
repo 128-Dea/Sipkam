@@ -196,7 +196,6 @@ public function show(Peminjaman $peminjaman)
 
                 Riwayat::create([
                     'id_pengembalian' => $pengembalian->id_pengembalian,
-                    'serah_terima'    => 'tidak',
                     'denda'           => 0,
                 ]);
             }

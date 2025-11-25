@@ -2,6 +2,8 @@
 
 @section('content')
 @php
+    use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
     $bookingList = $booking->filter(fn($p) => $p->status !== 'selesai');
 @endphp
 
@@ -69,8 +71,10 @@
                 @forelse($bookingList as $item)
                     @php
                         $bookingStatus = $item->status === 'ditolak' ? 'ditolak' : 'disetujui';
-                        $statusLabel = $bookingStatus === 'ditolak' ? 'Ditolak (Bentrok) 🕓' : 'Disetujui ✔️';
+                        $statusLabel = $bookingStatus === 'ditolak' ? 'Ditolak (Bentrok)' : 'Disetujui';
                         $badge = $bookingStatus === 'ditolak' ? 'danger' : 'success';
+                        $qrPayload = $item->qr?->payload;
+                        $qrSvg = $qrPayload ? base64_encode(QrCode::format('svg')->size(180)->margin(1)->generate($qrPayload)) : null;
                     @endphp
                     <tr data-booking-row
                         data-date="{{ \Carbon\Carbon::parse($item->waktu_awal)->toDateString() }}"
@@ -98,6 +102,7 @@
                                     data-akhir="{{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}"
                                     data-status="{{ ucfirst($item->status) }}"
                                     data-qr="{{ $item->qr->qr_code ?? '-' }}"
+                                    data-qr-svg="{{ $qrSvg }}"
                                     data-riwayat="Booking dibuat dan menunggu scan QR.">
                                 Lihat Detail
                             </button>
@@ -152,7 +157,13 @@
                             <span class="badge bg-primary" id="detail-status"></span>
                             <div class="mt-3">
                                 <div class="fw-semibold mb-1">QR / Kode Transaksi</div>
-                                <div id="detail-qr" class="text-monospace"></div>
+                                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                                    <div id="detail-qr-code" class="bg-light rounded p-2 d-inline-flex justify-content-center align-items-center" style="min-width:160px;min-height:160px;"></div>
+                                    <div>
+                                        <div id="detail-qr" class="text-monospace small"></div>
+                                        <small class="text-muted d-block mt-1">Tunjukkan QR ini ke petugas untuk aktivasi peminjaman.</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -211,6 +222,16 @@
             document.getElementById('detail-status').textContent = btn.dataset.status;
             document.getElementById('detail-qr').textContent = btn.dataset.qr;
             document.getElementById('detail-riwayat').textContent = btn.dataset.riwayat;
+
+            const qrContainer = document.getElementById('detail-qr-code');
+            qrContainer.innerHTML = '';
+            const svgEncoded = btn.dataset.qrSvg;
+            if (svgEncoded) {
+                const svgMarkup = atob(svgEncoded);
+                qrContainer.innerHTML = svgMarkup;
+            } else {
+                qrContainer.innerHTML = '<span class="text-muted small">QR tidak tersedia</span>';
+            }
         }
 
         document.querySelectorAll('.btn-detail').forEach(btn => {

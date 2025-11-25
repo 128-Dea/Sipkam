@@ -30,9 +30,9 @@ class BarangController extends Controller
         if ($user && $user->role === 'petugas') {
             $barang = $query->get();
 
-            // Filter status (hanya tersedia, dipinjam, service)
+            // Filter status (hanya tersedia, dipinjam, dalam_service)
             $statusFilter = $request->input('status');
-            if ($statusFilter && in_array($statusFilter, ['tersedia', 'dipinjam', 'service'], true)) {
+            if ($statusFilter && in_array($statusFilter, ['tersedia', 'dipinjam', 'dalam_service'], true)) {
                 $barang = $barang
                     ->filter(function (Barang $item) use ($statusFilter) {
                         return $item->status_otomatis === $statusFilter;

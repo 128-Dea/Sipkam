@@ -25,7 +25,7 @@
                 <select id="filter-kondisi" class="form-select form-control-modern">
                     <option value="">Semua</option>
                     <option value="tersedia" {{ $filters['kondisi']==='tersedia' ? 'selected' : '' }}>🟢 Baik</option>
-                    <option value="service" {{ $filters['kondisi']==='service' ? 'selected' : '' }}>🟡 Service / Rusak</option>
+                    <option value="dalam_service" {{ $filters['kondisi']==='dalam_service' ? 'selected' : '' }}>🟡 Service / Rusak</option>
                     <option value="hilang" {{ $filters['kondisi']==='hilang' ? 'selected' : '' }}>🔴 Hilang</option>
                 </select>
             </div>
@@ -56,10 +56,10 @@
                     @php
                         $p = $item->peminjaman;
                         $kondisi = $p?->barang?->status ?? 'tersedia';
-                        $kondisiLabel = '🟢 Baik';
+                        $kondisiLabel = 'Baik';
                         $badge = 'success';
-                        if ($kondisi === 'service') { $kondisiLabel = '🟡 Service / Rusak'; $badge = 'warning'; }
-                        if ($kondisi === 'hilang') { $kondisiLabel = '🔴 Hilang'; $badge = 'danger'; }
+                        if ($kondisi === 'dalam_service') { $kondisiLabel = 'Service / Rusak'; $badge = 'warning'; }
+                        if ($kondisi === 'hilang') { $kondisiLabel = 'Hilang'; $badge = 'danger'; }
                         $denda = $p?->denda?->sum('total_denda') ?? 0;
                     @endphp
                     <tr data-row
@@ -188,3 +188,6 @@
     });
 </script>
 @endsection
+
+
+

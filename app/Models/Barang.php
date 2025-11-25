@@ -72,10 +72,10 @@ class Barang extends Model
             ->count();                       
     }
 
-     // Banyak unit yang sedang dalam service (status service = 'service').
+    // Banyak unit yang sedang dalam service (status service belum selesai).
     public function getStokServiceAttribute(): int
     {
-        return (int) Service::where('status', 'service')
+        return (int) Service::whereIn('status', ['mengantri', 'diperbaiki'])
             ->whereHas('keluhan.peminjaman', function ($q) {
                 $q->where('id_barang', $this->id_barang);
             })
@@ -111,7 +111,7 @@ class Barang extends Model
         }
 
         if ($this->stok_service > 0) {
-            return 'service';
+            return 'dalam_service';
         }
 
         if ($this->stok_dipinjam > 0) {

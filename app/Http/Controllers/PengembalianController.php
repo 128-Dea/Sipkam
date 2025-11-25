@@ -319,7 +319,7 @@ class PengembalianController extends Controller
 
                 $nextStatus = 'tersedia';
                 if ($kondisi === 'rusak') {
-                    $nextStatus = 'service';
+                    $nextStatus = 'dalam_service';
                 } elseif ($kondisi === 'hilang') {
                     $nextStatus = 'hilang';
                 } elseif ($peminjaman->barang->stok <= 0) {

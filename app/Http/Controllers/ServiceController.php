@@ -28,12 +28,13 @@ class ServiceController extends Controller
 
     /**
      * Update status service + tanggal-tanggal.
+     * Status yang valid: mengantri, diperbaiki, selesai.
      * Jika status = selesai => barang dikembalikan ke stok (status = tersedia).
      */
     public function update(Request $request, Service $service)
     {
         $data = $request->validate([
-            'status'             => 'required|in:proses,selesai',
+            'status'             => 'required|in:mengantri,diperbaiki,selesai',
             'tgl_masuk_service'  => 'nullable|date',
             'estimasi_selesai'   => 'nullable|date',
         ]);

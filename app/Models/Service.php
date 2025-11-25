@@ -16,7 +16,7 @@ class Service extends Model
     protected $fillable = [
         'id_keluhan',
         'id_barang',
-        'status',              // proses / selesai
+        'status',              // mengantri / diperbaiki / selesai
         'tgl_masuk_service',   // tanggal barang masuk service
         'estimasi_selesai',    // estimasi selesai service
     ];

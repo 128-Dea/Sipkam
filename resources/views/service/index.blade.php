@@ -92,15 +92,18 @@
                                 <div class="mb-1">
                                     @if($item->status === 'selesai')
                                         <span class="badge bg-success">Selesai</span>
-                                    @else
+                                    @elseif($item->status === 'diperbaiki')
                                         <span class="badge bg-warning text-dark">Proses</span>
+                                    @else
+                                        <span class="badge bg-secondary">Mengantri</span>
                                     @endif
                                 </div>
 
                                 {{-- Dropdown untuk ubah status --}}
                                 <select name="status"
                                         class="form-select form-select-sm">
-                                    <option value="proses"  @selected($item->status === 'proses')>Proses</option>
+                                    <option value="mengantri"  @selected($item->status === 'mengantri')>Mengantri</option>
+                                    <option value="diperbaiki" @selected($item->status === 'diperbaiki')>Proses</option>
                                     <option value="selesai" @selected($item->status === 'selesai')>Selesai</option>
                                 </select>
                             </td>

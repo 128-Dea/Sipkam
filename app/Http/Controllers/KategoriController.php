@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\Service;
 
 class KategoriController extends Controller
 {
@@ -56,9 +58,46 @@ class KategoriController extends Controller
         return redirect()->route('petugas.kategori.index')->with('success', 'Kategori berhasil diperbarui');
     }
 
-    public function destroy(Kategori $kategori)
+    public function destroy(Request $request, Kategori $kategori)
     {
-        $kategori->delete();
+        $barang = $kategori->barang()->get(['id_barang', 'nama_barang']);
+
+        // Jika kategori masih dipakai, minta konfirmasi sebelum menghapus barang terkait.
+        if ($barang->isNotEmpty() && !$request->boolean('confirm_delete')) {
+            return view('kategori.confirm_delete', [
+                'kategori' => $kategori,
+                'barang'   => $barang,
+            ]);
+        }
+
+        DB::transaction(function () use ($kategori, $barang) {
+            foreach ($barang as $item) {
+                // Bersihkan dependensi yang menempel ke barang agar tidak melanggar FK.
+                $item->notifikasi()->delete();
+                $item->peminjaman()->each(function ($peminjaman) {
+                    $peminjaman->denda()->delete();
+                    $peminjaman->perpanjangan()->delete();
+
+                    $peminjaman->keluhan()->each(function ($keluhan) {
+                        $keluhan->service()->delete();
+                        $keluhan->delete();
+                    });
+
+                    if ($pengembalian = $peminjaman->pengembalian) {
+                        $pengembalian->riwayat()->delete();
+                        $pengembalian->delete();
+                    }
+
+                    $peminjaman->qr()->delete();
+                    $peminjaman->delete();
+                });
+
+                Service::where('id_barang', $item->id_barang)->delete();
+                $item->delete();
+            }
+
+            $kategori->delete();
+        });
 
         return redirect()->route('petugas.kategori.index')->with('success', 'Kategori berhasil dihapus');
     }

@@ -43,20 +43,21 @@
                 {{ $isPetugas ? 'Pantau laporan mahasiswa dan tindak lanjuti' : 'Kelola laporan gangguan selama peminjaman' }}
             </small>
         </div>
-        <div class="d-flex gap-2">
-            <form method="GET" class="d-flex gap-2">
-                <select name="status" class="form-select form-control-modern">
-                    <option value="">Semua Status</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>🕓 Pending</option>
-                    <option value="ditangani" {{ request('status') === 'ditangani' ? 'selected' : '' }}>🔧 Ditangani</option>
-                    <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>✔️ Selesai</option>
-                </select>
-                <button class="btn btn-modern btn-modern-primary" type="submit">Filter</button>
-            </form>
-            @if(!$isPetugas)
-                <a href="{{ route($scope . '.keluhan.create') }}" class="btn btn-primary">Laporkan Keluhan</a>
-            @endif
-        </div>
+        @if($isPetugas)
+            <div class="d-flex gap-2">
+                <form method="GET" class="d-flex gap-2">
+                    <select name="status" class="form-select form-control-modern">
+                        <option value="">Semua Status</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="ditangani" {{ request('status') === 'ditangani' ? 'selected' : '' }}>Ditangani</option>
+                        <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                    <button class="btn btn-modern btn-modern-primary" type="submit">Filter</button>
+                </form>
+            </div>
+        @else
+            <a href="{{ route($scope . '.keluhan.create') }}" class="btn btn-primary">Laporkan Keluhan</a>
+        @endif
     </div>
 
     <div class="card keluhan-card border-0">

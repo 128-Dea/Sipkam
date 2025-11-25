@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:mahasiswa'])
         Route::get('/dashboard', [MahasiswaController::class, 'index'])->name('dashboard');
 
         Route::resource('peminjaman', PeminjamanController::class);
+        Route::post('peminjaman/{peminjaman}/batal', [PeminjamanController::class, 'cancel'])->name('peminjaman.cancel');
         Route::resource('keluhan', KeluhanController::class)->except(['edit', 'update', 'destroy']);
         Route::resource('perpanjangan', PerpanjanganController::class)->only(['index', 'create', 'store', 'update']);
         Route::resource('notifikasi', NotifikasiController::class)->only(['index', 'destroy']);

@@ -219,11 +219,6 @@
                 </table>
             </div>
 
-            <div class="card-footer bg-white small text-muted">
-                <strong>Keterangan:</strong>
-                <span class="ms-2">Stok Total = stok di database,</span>
-                <span class="ms-2">Tersedia = stok total − dipinjam − service.</span>
-            </div>
         </div>
 
     @else

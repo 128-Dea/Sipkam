@@ -148,6 +148,36 @@ public function show(Peminjaman $peminjaman)
     }
 
     /**
+     * Batalkan booking oleh mahasiswa sebelum diaktivasi petugas.
+     */
+    public function cancel(Peminjaman $peminjaman)
+    {
+        $user = auth()->user();
+        abort_unless($user && $user->role === 'mahasiswa', 403);
+
+        $penggunaId = $this->resolvePenggunaId($user);
+        abort_unless($penggunaId && $peminjaman->id_pengguna === $penggunaId, 403);
+
+        if ($peminjaman->status !== 'booking') {
+            return back()->with('error', 'Hanya booking yang belum aktif yang bisa dibatalkan.');
+        }
+
+        $peminjaman->update(['status' => 'dibatalkan']);
+
+        // Nonaktifkan QR agar tidak bisa dipakai setelah dibatalkan.
+        if ($peminjaman->qr) {
+            $peminjaman->qr->update(['is_active' => false]);
+        }
+
+        // Kembalikan stok/ status barang jika kita sudah mengurangi saat booking dibuat.
+        $this->kembalikanBarangSetelahBatal($peminjaman->barang);
+
+        return redirect()
+            ->route('mahasiswa.peminjaman.index')
+            ->with('success', 'Booking berhasil dibatalkan.');
+    }
+
+    /**
      * Aktifkan peminjaman dari hasil scan QR (petugas).
      * Mengubah status booking => berlangsung (aktif).
      */
@@ -211,6 +241,24 @@ public function show(Peminjaman $peminjaman)
             }
         } elseif (in_array($barang->status, ['tersedia', 'dipinjam'])) {
             $barang->update(['status' => 'dipinjam']);
+        }
+    }
+
+    protected function kembalikanBarangSetelahBatal(?Barang $barang): void
+    {
+        if (!$barang) {
+            return;
+        }
+
+        if (!is_null($barang->stok)) {
+            $barang->increment('stok');
+            $barang->refresh();
+
+            if (in_array($barang->status, ['tersedia', 'dipinjam'], true)) {
+                $barang->update(['status' => 'tersedia']);
+            }
+        } elseif (in_array($barang->status, ['dipinjam', 'tersedia'], true)) {
+            $barang->update(['status' => 'tersedia']);
         }
     }
 

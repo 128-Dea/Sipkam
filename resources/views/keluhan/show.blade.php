@@ -78,14 +78,6 @@
                                         {{ $status ?? 'N/A' }}
                                     </span>
                                 </div>
-                                <div class="text-muted small mb-1">Tanggal Pinjam</div>
-                                <div class="fw-semibold mb-3">
-                                    {{ optional($peminjaman?->tanggal_pinjam)->format('d M Y') ?? '-' }}
-                                </div>
-                                <div class="text-muted small mb-1">Tanggal Kembali</div>
-                                <div class="fw-semibold">
-                                    {{ optional($peminjaman?->tanggal_kembali)->format('d M Y') ?? '-' }}
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -35,4 +35,13 @@ class Service extends Model
     {
         return $this->belongsTo(Barang::class, 'id_barang', 'id_barang');
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $service) {
+            if (empty($service->tgl_masuk_service)) {
+                $service->tgl_masuk_service = now();
+            }
+        });
+    }
 }

@@ -158,11 +158,6 @@
                                             data-riwayat="Peminjaman aktif. Riwayat perpanjangan: {{ $item->perpanjangan->count() }} kali. Keluhan: {{ $item->keluhan->count() }}.">
                                         Detail
                                     </button>
-                                    @if($item->qr)
-                                        <button class="btn btn-sm btn-modern btn-modern-success btn-scan-attach" data-qr="{{ $item->qr->qr_code }}">
-                                            🔍 Scan
-                                        </button>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -249,6 +244,7 @@
             const qrReader = document.getElementById('qr-reader');
             let scanner = null;
             let isCameraActive = false;
+            let isSubmitting = false;
 
             function showToast(message, variant = 'success') {
                 const wrapper = document.createElement('div');
@@ -375,6 +371,41 @@
                 return found;
             }
 
+            async function activateViaApi(qrCode) {
+                if (isSubmitting) return;
+                isSubmitting = true;
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                try {
+                    const res = await fetch('{{ route('petugas.peminjaman.activate') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ qr_code: qrCode }),
+                    });
+
+                    if (!res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        throw new Error(data.message || 'QR tidak valid atau peminjaman tidak ditemukan');
+                    }
+
+                    showToast('Peminjaman diaktifkan. Memuat ulang...', 'success');
+
+                    // Segera ubah badge di tabel (jika ada) sambil menunggu reload.
+                    markAsScanned(qrCode);
+
+                    setTimeout(() => window.location.reload(), 600);
+                } catch (err) {
+                    console.error(err);
+                    showToast(err.message, 'danger');
+                } finally {
+                    isSubmitting = false;
+                }
+            }
+
             scanBtn?.addEventListener('click', () => {
                 const qrCode = scanInput.value.trim();
                 if (!qrCode) {
@@ -382,21 +413,10 @@
                     return;
                 }
 
-                const ok = markAsScanned(qrCode);
-                if (ok) {
-                    showToast('QR valid. Status berubah menjadi Dipinjam.', 'success');
-                } else {
-                    showToast('QR tidak ditemukan pada daftar aktif.', 'danger');
-                }
+                activateViaApi(qrCode);
                 scanInput.value = '';
             });
 
-            document.querySelectorAll('.btn-scan-attach').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    scanInput.value = btn.dataset.qr;
-                    scanBtn.click();
-                });
-            });
         });
     </script>
 
@@ -535,9 +555,13 @@
                         @forelse($peminjaman as $item)
                             @php
                                 $status = $item->status;
-                                $badge = $status === 'berlangsung'
-                                    ? 'info'
-                                    : ($status === 'selesai' ? 'success' : 'danger');
+                                $badge = match ($status) {
+                                    'berlangsung' => 'info',
+                                    'selesai'     => 'success',
+                                    'booking'     => 'warning',
+                                    'dibatalkan'  => 'secondary',
+                                    default       => 'danger',
+                                };
                             @endphp
                             <tr>
                                 <td class="col-kode">#{{ $item->id_peminjaman }}</td>
@@ -552,10 +576,22 @@
                                     <span class="badge bg-{{ $badge }}">{{ ucfirst($status) }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('mahasiswa.peminjaman.show', $item->id_peminjaman) }}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Detail
-                                    </a>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('mahasiswa.peminjaman.show', $item->id_peminjaman) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Detail
+                                        </a>
+                                        @if($status === 'booking')
+                                            <form method="POST"
+                                                  action="{{ route('mahasiswa.peminjaman.cancel', $item->id_peminjaman) }}"
+                                                  onsubmit="return confirm('Batalkan booking ini?');">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Batal
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

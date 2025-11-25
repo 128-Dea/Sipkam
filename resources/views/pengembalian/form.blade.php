@@ -107,14 +107,6 @@
                             <label class="form-label form-label-modern">Upload Foto Kerusakan (opsional)</label>
                             <input type="file" name="foto_kerusakan" accept="image/*" class="form-control form-control-modern">
                         </div>
-                        <div class="col-12">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="diterima_fisik" name="diterima_fisik" required>
-                                <label class="form-check-label" for="diterima_fisik">
-                                    Barang sudah diterima fisik oleh petugas
-                                </label>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 justify-content-end mt-4">
@@ -144,8 +136,10 @@
         const fieldBiayaRusak = document.getElementById('field-biaya-rusak');
         const fieldBiayaHilang = document.getElementById('field-biaya-hilang');
         const suggestRusak = document.getElementById('suggest-rusak');
+        const biayaHilang = document.getElementById('biaya_hilang');
         const waktuInput = document.getElementById('waktu-pengembalian');
         const latenessInfo = document.getElementById('lateness-info');
+        const hargaBarang = Number('{{ $peminjaman->barang->harga ?? 0 }}');
 
         // Saran denda berdasarkan kategori barang (kasar)
         const kategori = '{{ strtolower($peminjaman->barang->kategori->nama ?? '') }}';
@@ -184,6 +178,14 @@
             fieldFoto.style.display = isRusak ? '' : 'none';
             fieldBiayaRusak.style.display = isRusak ? '' : 'none';
             fieldBiayaHilang.style.display = isHilang ? '' : 'none';
+
+            if (isHilang && biayaHilang) {
+                biayaHilang.value = hargaBarang || 0;
+                biayaHilang.readOnly = true;
+            } else if (biayaHilang) {
+                biayaHilang.readOnly = false;
+                biayaHilang.value = '';
+            }
         }
 
         kondisi.addEventListener('change', toggleFields);

@@ -114,7 +114,7 @@ class RiwayatController extends Controller
                 'peminjaman.denda',
             ])
             ->whereHas('peminjaman', function ($q) {
-                $q->where('status', 'selesai');
+                $q->whereIn('status', ['selesai', 'dibatalkan']);
             })
             ->when($kondisi, function ($q, $kondisi) {
                 $q->whereHas('peminjaman', function ($qp) use ($kondisi) {

@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Pengguna;
 use App\Models\Peminjaman;
+use App\Models\Pengembalian;
+use App\Models\Riwayat;
 use App\Models\Qr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PeminjamanController extends Controller
@@ -23,7 +26,7 @@ class PeminjamanController extends Controller
             $penggunaId = $this->resolvePenggunaId($user);
             if ($penggunaId) {
                 $query->where('id_pengguna', $penggunaId)
-                    ->where('status', '!=', 'selesai');
+                    ->where('status', 'berlangsung');
             }
         }
 
@@ -169,15 +172,35 @@ public function show(Peminjaman $peminjaman)
             return back()->with('error', 'Hanya booking yang belum aktif yang bisa dibatalkan.');
         }
 
-        $peminjaman->update(['status' => 'dibatalkan']);
+        DB::transaction(function () use ($peminjaman, $user) {
+            $peminjaman->update(['status' => 'dibatalkan']);
 
-        // Nonaktifkan QR agar tidak bisa dipakai setelah dibatalkan.
-        if ($peminjaman->qr) {
-            $peminjaman->qr->update(['is_active' => false]);
-        }
+            // Nonaktifkan QR agar tidak bisa dipakai setelah dibatalkan.
+            if ($peminjaman->qr) {
+                $peminjaman->qr->update(['is_active' => false]);
+            }
 
-        // Kembalikan stok/ status barang jika kita sudah mengurangi saat booking dibuat.
-        $this->kembalikanBarangSetelahBatal($peminjaman->barang);
+            // Kembalikan stok/ status barang jika kita sudah mengurangi saat booking dibuat.
+            $this->kembalikanBarangSetelahBatal($peminjaman->barang);
+
+            // Catat ke tabel pengembalian + riwayat agar tampil di histori.
+            if (!$peminjaman->pengembalian) {
+                $pengembalian = Pengembalian::create([
+                    'id_peminjaman'      => $peminjaman->id_peminjaman,
+                    'waktu_pengembalian' => now(),
+                    'catatan'            => sprintf(
+                        'Booking dibatalkan oleh %s',
+                        $user->name ?? 'mahasiswa'
+                    ),
+                ]);
+
+                Riwayat::create([
+                    'id_pengembalian' => $pengembalian->id_pengembalian,
+                    'serah_terima'    => 'tidak',
+                    'denda'           => 0,
+                ]);
+            }
+        });
 
         return redirect()
             ->route('mahasiswa.peminjaman.index')

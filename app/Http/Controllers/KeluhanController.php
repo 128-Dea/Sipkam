@@ -27,10 +27,14 @@ class KeluhanController extends Controller
 
     public function create()
     {
-        $pengguna = Pengguna::all();
-        $peminjaman = Peminjaman::with('barang')->get();
+        $authPenggunaId = $this->resolveAuthPenggunaId();
 
-        return view('keluhan.create', compact('pengguna', 'peminjaman'));
+        $peminjaman = Peminjaman::with(['barang', 'pengguna'])
+            ->where('status', 'berlangsung')
+            ->when($authPenggunaId, fn($q) => $q->where('id_pengguna', $authPenggunaId))
+            ->get();
+
+        return view('keluhan.create', compact('peminjaman'));
     }
 
     public function store(Request $request)
@@ -48,6 +52,11 @@ class KeluhanController extends Controller
         // Pastikan hanya pemilik peminjaman yang bisa membuat keluhan
         if ($authPenggunaId === null || $peminjaman->id_pengguna !== $authPenggunaId) {
             return back()->withErrors(['id_peminjaman' => 'Anda tidak memiliki akses untuk membuat keluhan pada peminjaman ini.']);
+        }
+
+        // Hanya boleh lapor untuk peminjaman yang sedang berlangsung
+        if ($peminjaman->status !== 'berlangsung') {
+            return back()->withErrors(['id_peminjaman' => 'Keluhan hanya untuk peminjaman yang masih berlangsung.'])->withInput();
         }
 
         if ($request->hasFile('foto_keluhan')) {

@@ -21,12 +21,15 @@
                     @php
                         $peminjaman = $item->pengembalian->peminjaman ?? null;
                         $denda = $peminjaman?->denda?->sum('total_denda') ?? 0;
+                        $isCanceled = $peminjaman?->status === 'dibatalkan';
+                        $waktuAwalDisplay = $isCanceled ? '-' : optional($peminjaman?->waktu_awal ? \Carbon\Carbon::parse($peminjaman->waktu_awal) : null)->format('d M Y');
+                        $waktuKembaliDisplay = $isCanceled ? '-' : optional($item->pengembalian?->waktu_pengembalian)->format('d M Y') ?? '-';
                     @endphp
                     <tr>
                         <td>{{ $peminjaman->pengguna->nama ?? '-' }}</td>
                         <td>{{ $peminjaman->barang->nama_barang ?? '-' }}</td>
-                        <td>{{ optional($peminjaman?->waktu_awal ? \Carbon\Carbon::parse($peminjaman->waktu_awal) : null)->format('d M Y') }}</td>
-                        <td>{{ optional($item->pengembalian?->waktu_pengembalian)->format('d M Y') ?? '-' }}</td>
+                        <td>{{ $waktuAwalDisplay }}</td>
+                        <td>{{ $waktuKembaliDisplay }}</td>
                         <td>
                             @if($denda > 0)
                                 <span class="badge bg-danger">Rp {{ number_format($denda, 0, ',', '.') }}</span>

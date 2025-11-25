@@ -61,22 +61,25 @@
                         if ($kondisi === 'dalam_service') { $kondisiLabel = 'Service / Rusak'; $badge = 'warning'; }
                         if ($kondisi === 'hilang') { $kondisiLabel = 'Hilang'; $badge = 'danger'; }
                         $denda = $p?->denda?->sum('total_denda') ?? 0;
+                        $isCanceled = $p?->status === 'dibatalkan';
+                        $pinjamDisplay = $isCanceled ? '-' : \Carbon\Carbon::parse($p?->waktu_awal)->translatedFormat('d M Y H:i');
+                        $kembaliDisplay = $isCanceled ? '-' : \Carbon\Carbon::parse($item->waktu_pengembalian)->translatedFormat('d M Y H:i');
                     @endphp
                     <tr data-row
                         data-nama="{{ $p?->pengguna?->nama ?? '-' }}"
                         data-email="{{ $p?->pengguna?->email ?? '-' }}"
                         data-barang="{{ $p?->barang?->nama_barang ?? '-' }}"
                         data-kode="{{ $p?->barang?->kode_barang ?? '-' }}"
-                        data-pinjam="{{ \Carbon\Carbon::parse($p?->waktu_awal)->translatedFormat('d M Y H:i') }}"
-                        data-kembali="{{ \Carbon\Carbon::parse($item->waktu_pengembalian)->translatedFormat('d M Y H:i') }}"
+                        data-pinjam="{{ $pinjamDisplay }}"
+                        data-kembali="{{ $kembaliDisplay }}"
                         data-kondisi="{{ $kondisiLabel }}"
                         data-denda="Rp {{ number_format($denda, 0, ',', '.') }}"
                         data-catatan="{{ $item->catatan ?? '-' }}"
                     >
                         <td>{{ $p?->pengguna?->nama ?? '-' }}</td>
                         <td>{{ $p?->barang?->nama_barang ?? '-' }}</td>
-                        <td class="text-nowrap">{{ \Carbon\Carbon::parse($p?->waktu_awal)->translatedFormat('d M Y') }}</td>
-                        <td class="text-nowrap">{{ \Carbon\Carbon::parse($item->waktu_pengembalian)->translatedFormat('d M Y') }}</td>
+                        <td class="text-nowrap">{{ $isCanceled ? '-' : \Carbon\Carbon::parse($p?->waktu_awal)->translatedFormat('d M Y') }}</td>
+                        <td class="text-nowrap">{{ $isCanceled ? '-' : \Carbon\Carbon::parse($item->waktu_pengembalian)->translatedFormat('d M Y') }}</td>
                         <td><span class="badge bg-{{ $badge }}">{{ $kondisiLabel }}</span></td>
                         <td>Rp {{ number_format($denda, 0, ',', '.') }}</td>
                         <td class="text-center">
@@ -196,4 +199,3 @@
     });
 </script>
 @endsection
-

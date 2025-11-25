@@ -129,7 +129,8 @@
                             data-date="{{ \Carbon\Carbon::parse($item->waktu_awal)->toDateString() }}"
                             data-status="{{ $item->status }}"
                             data-search="{{ strtolower(($item->pengguna->nama ?? '') . ' ' . ($item->barang->nama_barang ?? '')) }}"
-                            data-qr="{{ $item->qr->qr_code ?? '' }}">
+                            data-qr="{{ $item->qr->qr_code ?? '' }}"
+                            data-qrpayload="{{ $item->qr->payload ?? '' }}">
                             <td>
                                 {{ $item->pengguna->nama ?? '-' }}<br>
                                 <small class="text-muted">{{ $item->pengguna->email ?? '' }}</small>
@@ -155,6 +156,7 @@
                                             data-akhir="{{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}"
                                             data-status="{{ ucfirst($item->status) }}"
                                             data-qr="{{ $item->qr->qr_code ?? '-' }}"
+                                            data-qrpayload="{{ $item->qr->payload ?? '' }}"
                                             data-riwayat="Peminjaman aktif. Riwayat perpanjangan: {{ $item->perpanjangan->count() }} kali. Keluhan: {{ $item->keluhan->count() }}.">
                                         Detail
                                     </button>
@@ -211,6 +213,10 @@
                                 <div class="mt-3">
                                     <div class="fw-semibold mb-1">QR / Kode Transaksi</div>
                                     <div id="detail-qr" class="text-monospace"></div>
+                                    <div class="mt-2 text-center">
+                                        <img id="detail-qr-img" src="" alt="QR Peminjaman" class="img-fluid rounded border" style="max-width: 180px; display:none;">
+                                        <div id="detail-qr-empty" class="text-muted small" style="display:none;">QR belum tersedia.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -290,6 +296,17 @@
                 document.getElementById('detail-akhir').textContent = btn.dataset.akhir;
                 document.getElementById('detail-status').textContent = btn.dataset.status;
                 document.getElementById('detail-qr').textContent = btn.dataset.qr;
+                const img = document.getElementById('detail-qr-img');
+                const empty = document.getElementById('detail-qr-empty');
+                const payload = btn.dataset.qrpayload || '';
+                if (payload) {
+                    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payload)}`;
+                    img.style.display = 'block';
+                    empty.style.display = 'none';
+                } else {
+                    img.style.display = 'none';
+                    empty.style.display = 'block';
+                }
                 document.getElementById('detail-riwayat').textContent = btn.dataset.riwayat;
             }
 

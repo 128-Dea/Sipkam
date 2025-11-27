@@ -9,7 +9,7 @@
         margin: -1.5rem -1.5rem -1.5rem;
         padding: 1.5rem 1.5rem 2rem;
         min-height: calc(100vh - 72px);
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #0ea5e9 100%);
+        background: linear-gradient(135deg, #163832, 0%, #235347, 45%, #8EB69B 100%);
     }
 
     @media (max-width: 768px) {
@@ -79,7 +79,7 @@
         border-radius: 18px;
         border: none;
         overflow: hidden;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #0ea5e9 100%);
+        background: linear-gradient(125deg,  #163832, 0%, #235347, 45%, #8EB69B 100%);
         box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
         color: #0f172a;
     }
@@ -221,18 +221,18 @@
     form.peminjaman-form .btn-primary {
         border-radius: 999px;
         padding-inline: 22px;
-        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        background: linear-gradient(135deg, #8EB69B, #235347);
         border-color: transparent;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4);
+        box-shadow: 0 12px 30px rgba(8, 107, 71, 0.4);
     }
 
     form.peminjaman-form .btn-primary:hover {
         transform: translateY(-1px);
-        box-shadow: 0 16px 40px rgba(79, 70, 229, 0.6);
+        box-shadow: 0 16px 40px rgba(14, 118, 77, 0.6);
     }
 
     /* DARK MODE: tombol utama hijau neon */

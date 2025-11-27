@@ -6,17 +6,35 @@
 
 @section('content')
 
-{{-- ====== STYLE DASHBOARD MAHASISWA (LIGHT + DARK NEON + ANIMASI) ====== --}}
+{{-- ====== STYLE DASHBOARD MAHASISWA (PALET HIJAU SIPKAM + DARK NEON) ====== --}}
 <style>
     :root {
-        /* Light theme */
-        --sipkam-bg-light: linear-gradient(135deg, #d7f3f4 0%, #e8f2ff 40%, #dde9fb 100%);
-        --sipkam-card-light: rgba(255, 255, 255, 0.96);
-        --sipkam-text-dark: #0f172a;
-        --sipkam-text-muted: #64748b;
+        /* Palet hijau SIPKAM (sama seperti referensi) */
+        --sipkam-green-900: #051F20;
+        --sipkam-green-800: #0B2B26;
+        --sipkam-green-700: #163832;
+        --sipkam-green-600: #235347;
+        --sipkam-green-300: #8EB69B;
+        --sipkam-green-100: #DAF1DE;
 
-        /* Dark theme (hitam + neon hijau) */
-        --sipkam-bg-dark: radial-gradient(circle at top, #020617 0%, #020617 40%, #020617 100%);
+        /* Light theme */
+        --sipkam-bg-light: radial-gradient(
+            circle at 0% 0%,
+            var(--sipkam-green-100) 0%,
+            var(--sipkam-green-300) 36%,
+            var(--sipkam-green-600) 100%
+        );
+        --sipkam-card-light: rgba(255, 255, 255, 0.96);
+        --sipkam-text-dark: #02130f;
+        --sipkam-text-muted: #556b64;
+
+        /* Dark theme (gelap + neon hijau) */
+        --sipkam-bg-dark: radial-gradient(
+            circle at top,
+            var(--sipkam-green-900) 0%,
+            #020617 40%,
+            #000000 100%
+        );
         --sipkam-card-dark: #020617;
         --sipkam-text-dark-mode: #e5e7eb;
         --sipkam-muted-dark: #9ca3af;
@@ -28,15 +46,15 @@
     body.sipkam-light {
         background: var(--sipkam-bg-light);
         color: var(--sipkam-text-dark);
-        background-size: 300% 300%;
-        animation: sipkamGradientLight 10s ease infinite; /* lebih cepat */
+        background-size: 280% 280%;
+        animation: sipkamGradientLight 12s ease infinite;
     }
 
     body.sipkam-dark {
         background: var(--sipkam-bg-dark);
         color: var(--sipkam-text-dark-mode);
-        background-size: 200% 200%;
-        animation: sipkamGradientDark 12s ease infinite; /* lebih cepat */
+        background-size: 220% 220%;
+        animation: sipkamGradientDark 14s ease infinite;
     }
 
     @keyframes sipkamGradientLight {
@@ -54,12 +72,12 @@
     /* ====== WRAPPER DASHBOARD ====== */
     .sipkam-dashboard {
         position: relative;
-        overflow: hidden; /* supaya animasi di belakang nggak keluar area */
+        overflow: hidden;
         padding-top: 1.5rem;
         padding-bottom: 2.5rem;
     }
 
-    /* ====== ANIMASI NEON PARTICLES (BINTANG) ====== */
+    /* ====== ANIMASI NEON PARTICLES ====== */
     .sipkam-particles {
         position: absolute;
         inset: 0;
@@ -74,25 +92,25 @@
         height: 14px;
         border-radius: 999px;
         opacity: .7;
-        animation: floatParticle 5.5s linear infinite; /* base lebih cepat */
+        animation: floatParticle 5.5s linear infinite;
     }
 
     /* warna partikel mengikuti tema */
     body.sipkam-light .sipkam-particles span {
         background: radial-gradient(circle,
-            rgba(59, 130, 246, 0.95),
-            rgba(59, 130, 246, 0.0) 60%);
-        box-shadow: 0 0 18px rgba(59, 130, 246, 0.9); /* biru di mode terang */
+            rgba(5, 95, 80, 0.95),
+            rgba(5, 95, 80, 0.0) 60%);
+        box-shadow: 0 0 18px rgba(5, 95, 80, 0.9);
     }
 
     body.sipkam-dark .sipkam-particles span {
         background: radial-gradient(circle,
             rgba(34, 197, 94, 0.95),
             rgba(34, 197, 94, 0.0) 60%);
-        box-shadow: 0 0 18px rgba(34, 197, 94, 0.9); /* hijau neon di mode gelap */
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
     }
 
-    /* posisi & kecepatan beda-beda biar hidup – ditambah jumlah bintang */
+    /* posisi & kecepatan beda-beda */
     .sipkam-particles span:nth-child(1)  { top: 10%; left: 18%; animation-duration: 4.5s; animation-delay: -1s; }
     .sipkam-particles span:nth-child(2)  { top: 25%; left: 70%; animation-duration: 5.2s; animation-delay: -2s; }
     .sipkam-particles span:nth-child(3)  { top: 60%; left: 15%; animation-duration: 5.8s; animation-delay: -3s; }
@@ -133,9 +151,10 @@
     .sipkam-dashboard .dashboard-header {
         border-radius: 20px;
         padding: 16px 24px;
-        background: rgba(255, 255, 255, 0.96);
-        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        background: rgba(250, 255, 252, 0.96);
+        box-shadow: 0 16px 36px rgba(5, 31, 32, 0.18);
         backdrop-filter: blur(20px);
+        border: 1px solid rgba(5, 31, 32, 0.06);
     }
 
     body.sipkam-dark .sipkam-dashboard .dashboard-header {
@@ -147,7 +166,7 @@
     /* ====== CARD UMUM ====== */
     .sipkam-dashboard .card-modern {
         border-radius: 18px;
-        border: none;
+        border: 1px solid rgba(5, 31, 32, 0.06);
         background: var(--sipkam-card-light);
         box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
         backdrop-filter: blur(18px);
@@ -169,6 +188,11 @@
         padding-top: .9rem;
     }
 
+    /* Supaya text-primary di dashboard ikut hijau tema */
+    .sipkam-dashboard .text-primary {
+        color: var(--sipkam-green-700) !important;
+    }
+
     /* Saat dark mode, semua .text-dark & .text-muted di-adjust */
     body.sipkam-dark .sipkam-dashboard .text-dark {
         color: var(--sipkam-text-dark-mode) !important;
@@ -179,8 +203,28 @@
 
     /* ====== KARTU STATISTIK ====== */
     .stat-card {
+        position: relative;
+        overflow: hidden;
         background: var(--sipkam-card-light) !important;
         color: var(--sipkam-text-dark);
+    }
+
+    /* strip hijau di sisi kiri kartu */
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        inset: -1px auto -1px 0;
+        width: 6px;
+        background: linear-gradient(
+            180deg,
+            var(--sipkam-green-600),
+            var(--sipkam-green-300)
+        );
+        opacity: .95;
+    }
+
+    body.sipkam-dark .stat-card::before {
+        background: linear-gradient(180deg, #22c55e, #4ade80);
     }
 
     .stat-card .label {
@@ -206,8 +250,8 @@
     }
 
     .stat-pill-aktif {
-        background: rgba(37, 99, 235, .1);
-        color: #1d4ed8;
+        background: rgba(11, 43, 38, .09);
+        color: var(--sipkam-green-800);
     }
 
     .stat-pill-menunggu {
@@ -264,7 +308,7 @@
         padding: 10px 12px;
         border-radius: 14px;
         text-decoration: none !important;
-        background: rgba(248, 250, 252, 0.98);
+        background: rgba(250, 255, 252, 0.97);
         color: var(--sipkam-text-dark);
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
         transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
@@ -287,7 +331,7 @@
         font-size: .9rem;
     }
 
-    .shortcut-icon-primary   { background: #e0f2fe; color: #0f6efc; }
+    .shortcut-icon-primary   { background: rgba(5, 31, 32, 0.08);  color: var(--sipkam-green-800); }
     .shortcut-icon-warning   { background: #fef3c7; color: #d97706; }
     .shortcut-icon-info      { background: #cffafe; color: #0891b2; }
     .shortcut-icon-success   { background: #dcfce7; color: #16a34a; }
@@ -330,7 +374,7 @@
     .peminjaman-item {
         border-radius: 16px;
         border: none;
-        background: rgba(248, 250, 252, 0.98);
+        background: rgba(250, 255, 252, 0.97);
     }
     .peminjaman-item small {
         color: var(--sipkam-text-muted);
@@ -346,7 +390,7 @@
     /* ====== AKTIVITAS ====== */
     .aktivitas-item {
         border-radius: 14px;
-        background: rgba(248, 250, 252, 0.98);
+        background: rgba(250, 255, 252, 0.97);
     }
     body.sipkam-dark .aktivitas-item {
         background: #020617;
@@ -359,7 +403,7 @@
         font-size: .8rem;
         padding: 6px 12px;
         border: none;
-        background: rgba(15, 23, 42, 0.06);
+        background: rgba(5, 31, 32, 0.06);
         color: var(--sipkam-text-dark);
         display: inline-flex;
         align-items: center;

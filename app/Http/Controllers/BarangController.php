@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class BarangController extends Controller
 {
@@ -30,9 +31,9 @@ class BarangController extends Controller
         if ($user && $user->role === 'petugas') {
             $barang = $query->get();
 
-            // Filter status (hanya tersedia, dipinjam, service)
+            // Filter status (hanya tersedia, dipinjam, dalam_service)
             $statusFilter = $request->input('status');
-            if ($statusFilter && in_array($statusFilter, ['tersedia', 'dipinjam', 'service'], true)) {
+            if ($statusFilter && in_array($statusFilter, ['tersedia', 'dipinjam', 'dalam_service'], true)) {
                 $barang = $barang
                     ->filter(function (Barang $item) use ($statusFilter) {
                         return $item->status_otomatis === $statusFilter;
@@ -140,6 +141,7 @@ class BarangController extends Controller
             Storage::disk('public')->delete($barang->foto_path);
         }
 
+        // FK akan otomatis set null (melalui migration terbaru) sehingga riwayat tetap ada.
         $barang->delete();
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');

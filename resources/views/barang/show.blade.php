@@ -345,7 +345,7 @@ Peminjam juga diwajibkan mengembalikan barang tepat waktu. Keterlambatan pengemb
                                     <span class="badge bg-success">Tersedia</span>
                                 @elseif($status === 'dipinjam')
                                     <span class="badge bg-warning text-dark">Sedang Dipinjam</span>
-                                @elseif($status === 'service')
+                                @elseif($status === 'dalam_service')
                                     <span class="badge bg-info text-dark">Sedang Service</span>
                                 @elseif($status === 'habis')
                                     <span class="badge bg-secondary">Stok Habis</span>

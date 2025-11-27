@@ -157,7 +157,6 @@ class PengembalianController extends Controller
             'catatan'             => 'nullable|string',
             'biaya_rusak'         => 'nullable|numeric|min:0',
             'biaya_hilang'        => 'nullable|numeric|min:0',
-            'diterima_fisik'      => 'accepted',
             'foto_kerusakan'      => 'nullable|image|max:2048',
         ]);
 
@@ -175,7 +174,9 @@ class PengembalianController extends Controller
 
         // Normalisasi biaya berdasar kondisi
         $biayaRusak = $kondisi === 'rusak' ? ($data['biaya_rusak'] ?? 0) : 0;
-        $biayaHilang = $kondisi === 'hilang' ? ($data['biaya_hilang'] ?? 0) : 0;
+        $biayaHilang = $kondisi === 'hilang'
+            ? ($data['biaya_hilang'] ?? ($peminjaman->barang->harga ?? 0))
+            : 0;
 
         $this->prosesPengembalianTransaksi([
             'id_peminjaman'      => $peminjaman->id_peminjaman,
@@ -319,7 +320,7 @@ class PengembalianController extends Controller
 
                 $nextStatus = 'tersedia';
                 if ($kondisi === 'rusak') {
-                    $nextStatus = 'service';
+                    $nextStatus = 'dalam_service';
                 } elseif ($kondisi === 'hilang') {
                     $nextStatus = 'hilang';
                 } elseif ($peminjaman->barang->stok <= 0) {
@@ -334,7 +335,6 @@ class PengembalianController extends Controller
             // Simpan ke tabel riwayat
             Riwayat::create([
                 'id_pengembalian' => $pengembalian->id_pengembalian,
-                'serah_terima'    => $totalDenda > 0 ? 'ya' : 'tidak',
                 'denda'           => $totalDenda,
             ]);
         });

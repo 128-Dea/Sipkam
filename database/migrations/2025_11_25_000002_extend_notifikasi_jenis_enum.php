@@ -13,7 +13,6 @@ return new class extends Migration
             MODIFY `jenis` ENUM(
                 'perpanjangan',
                 'denda',
-                'serah_terima',
                 'perpanjangan_diajukan',
                 'denda_baru',
                 'peminjaman_akan_habis',
@@ -28,7 +27,7 @@ return new class extends Migration
         // Kembalikan ke enum awal (akan gagal jika ada data dengan jenis baru).
         DB::statement("
             ALTER TABLE `notifikasi`
-            MODIFY `jenis` ENUM('perpanjangan','denda','serah_terima') NOT NULL
+            MODIFY `jenis` ENUM('perpanjangan','denda') NOT NULL
         ");
     }
 };

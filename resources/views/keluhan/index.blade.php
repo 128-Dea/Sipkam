@@ -189,7 +189,33 @@
 </style>
 
 <div class="keluhan-wrapper">
+<<<<<<< HEAD
     <div class="keluhan-inner">
+=======
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h1 class="h3 mb-1">{{ $isPetugas ? 'Keluhan Barang' : 'Keluhan Mahasiswa' }}</h1>
+            <small class="text-muted">
+                {{ $isPetugas ? 'Pantau laporan mahasiswa dan tindak lanjuti' : 'Kelola laporan gangguan selama peminjaman' }}
+            </small>
+        </div>
+        @if($isPetugas)
+            <div class="d-flex gap-2">
+                <form method="GET" class="d-flex gap-2">
+                    <select name="status" class="form-select form-control-modern">
+                        <option value="">Semua Status</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="ditangani" {{ request('status') === 'ditangani' ? 'selected' : '' }}>Ditangani</option>
+                        <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                    <button class="btn btn-modern btn-modern-primary" type="submit">Filter</button>
+                </form>
+            </div>
+        @else
+            <a href="{{ route($scope . '.keluhan.create') }}" class="btn btn-primary">Laporkan Keluhan</a>
+        @endif
+    </div>
+>>>>>>> e17174a0545b2a0e04f164f6a92a3ca46fb26a70
 
         {{-- HEADER --}}
         <div class="keluhan-header-block">

@@ -31,7 +31,7 @@ class Peminjaman extends Model
 
     public function barang(): BelongsTo
     {
-        return $this->belongsTo(Barang::class, 'id_barang', 'id_barang');
+        return $this->belongsTo(Barang::class, 'id_barang', 'id_barang')->withTrashed();
     }
 
     public function pengembalian(): HasOne

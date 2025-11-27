@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Service;
 
 class Barang extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'barang';
 
     protected $primaryKey = 'id_barang';
@@ -72,10 +75,10 @@ class Barang extends Model
             ->count();                       
     }
 
-     // Banyak unit yang sedang dalam service (status service = 'service').
+    // Banyak unit yang sedang dalam service (status service belum selesai).
     public function getStokServiceAttribute(): int
     {
-        return (int) Service::where('status', 'service')
+        return (int) Service::whereIn('status', ['mengantri', 'diperbaiki'])
             ->whereHas('keluhan.peminjaman', function ($q) {
                 $q->where('id_barang', $this->id_barang);
             })
@@ -111,7 +114,7 @@ class Barang extends Model
         }
 
         if ($this->stok_service > 0) {
-            return 'service';
+            return 'dalam_service';
         }
 
         if ($this->stok_dipinjam > 0) {

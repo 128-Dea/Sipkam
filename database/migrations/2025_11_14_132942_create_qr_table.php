@@ -13,20 +13,13 @@ return new class extends Migration
         Schema::create('qr', function (Blueprint $table) {
             $table->increments('id_qr');
             $table->string('qr_code', 255)->unique();
-            $table->enum('jenis_transaksi', ['peminjaman', 'serah_terima']);
+            $table->enum('jenis_transaksi', ['peminjaman']);
             $table->unsignedInteger('id_peminjaman')->nullable();
-            $table->unsignedInteger('id_serah_terima')->nullable();
             $table->dateTime('dibuat_pada')->default(DB::raw('CURRENT_TIMESTAMP'));
 
             $table->foreign('id_peminjaman')
                 ->references('id_peminjaman')
                 ->on('peminjaman')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
-
-            $table->foreign('id_serah_terima')
-                ->references('id_serah_terima')
-                ->on('serah_terima')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
         });

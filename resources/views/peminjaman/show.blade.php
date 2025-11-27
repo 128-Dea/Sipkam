@@ -10,6 +10,7 @@
     if ($status === 'berlangsung') $badge = 'info';
     elseif ($status === 'selesai') $badge = 'success';
     elseif ($status === 'ditolak') $badge = 'danger';
+    elseif ($status === 'booking') $badge = 'warning';
 @endphp
 
 <script>
@@ -30,6 +31,18 @@
                             <small class="text-muted">Peminjaman #{{ $peminjaman->id_peminjaman }}</small>
                         </div>
                         <div class="d-flex gap-2">
+                            @if($role === 'mahasiswa' && $status === 'booking')
+                                <form
+                                    method="POST"
+                                    action="{{ route('mahasiswa.peminjaman.cancel', $peminjaman->id_peminjaman) }}"
+                                    onsubmit="return confirm('Batalkan booking ini? QR akan dinonaktifkan.');"
+                                >
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        Batalkan Booking
+                                    </button>
+                                </form>
+                            @endif
                             <a
                                 href="{{ $role === 'petugas'
                                         ? route('petugas.peminjaman.index')

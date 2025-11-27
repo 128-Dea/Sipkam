@@ -16,7 +16,7 @@ return new class extends Migration
         // Kembalikan ke ENUM lama jika rollback (waspada: bisa gagal bila sudah ada nilai baru)
         DB::statement("
             ALTER TABLE `notifikasi`
-            MODIFY `jenis` ENUM('perpanjangan','denda','serah_terima') NOT NULL
+            MODIFY `jenis` ENUM('perpanjangan','denda') NOT NULL
         ");
     }
 };

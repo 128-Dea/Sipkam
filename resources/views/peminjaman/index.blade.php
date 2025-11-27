@@ -349,20 +349,131 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         {{-- TABEL PEMINJAMAN AKTIF --}}
         <div class="card border-0 shadow-sm peminjaman-aktif-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="mb-0">Peminjaman Aktif</h5>
                     <small>Transaksi yang sudah divalidasi QR</small>
+=======
+        {{-- Card Scan QR --}}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center me-2" style="width:44px;height:44px;">
+                            🔍
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Scan QR Mahasiswa</div>
+                            <small class="text-muted">Validasi sebelum aktivasi peminjaman</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-modern">Kode QR</label>
+                        <div class="input-group">
+                            <input type="text" id="scan-input" class="form-control form-control-modern" placeholder="Masukkan / scan kode QR" />
+                            <button class="btn btn-modern btn-modern-primary" id="btn-scan">Proses</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label form-label-modern">Pilih Kamera</label>
+                        <select id="camera-select" class="form-select form-control-modern">
+                            <option value="" disabled selected>Sedang memuat kamera...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label form-label-modern">Scan via Kamera</label>
+                        <div id="qr-reader" class="border rounded p-2" style="display:none;"></div>
+                    </div>
+
+                    <small class="text-muted">Isi QR: ID Mahasiswa, ID Peminjaman, Kode Transaksi.</small>
+>>>>>>> e17174a0545b2a0e04f164f6a92a3ca46fb26a70
                 </div>
                 <span class="badge">
                     {{ $activeList->count() }} aktif
                 </span>
             </div>
+<<<<<<< HEAD
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead>
+=======
+        </div>
+    </div>
+
+    {{-- TABEL PEMINJAMAN AKTIF --}}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">Peminjaman Aktif</h5>
+                <small class="text-muted">Transaksi yang sudah divalidasi QR</small>
+            </div>
+            <span class="badge bg-success bg-opacity-10 text-success">
+                {{ $activeList->count() }} aktif
+            </span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nama Mahasiswa</th>
+                        <th>Barang</th>
+                        <th>Tanggal Pinjam</th>
+                        <th>Estimasi Pengembalian</th>
+                        <th>Status</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="aktif-table">
+                    @forelse($activeList as $item)
+                        @php
+                            $badge = $item->status === 'berlangsung' ? 'info' : ($item->status === 'selesai' ? 'success' : 'secondary');
+                            $statusLabel = $item->status === 'berlangsung' ? 'Dipinjam ✔️' : ucfirst($item->status);
+                        @endphp
+                        <tr data-aktif-row
+                            data-date="{{ \Carbon\Carbon::parse($item->waktu_awal)->toDateString() }}"
+                            data-status="{{ $item->status }}"
+                            data-search="{{ strtolower(($item->pengguna->nama ?? '') . ' ' . ($item->barang->nama_barang ?? '')) }}"
+                            data-qr="{{ $item->qr->qr_code ?? '' }}"
+                            data-qrpayload="{{ $item->qr->payload ?? '' }}">
+                            <td>
+                                {{ $item->pengguna->nama ?? '-' }}<br>
+                                <small class="text-muted">{{ $item->pengguna->email ?? '' }}</small>
+                            </td>
+                            <td>{{ $item->barang->nama_barang ?? '-' }}</td>
+                            <td class="text-nowrap">
+                                {{ \Carbon\Carbon::parse($item->waktu_awal)->translatedFormat('d M Y H:i') }}
+                            </td>
+                            <td class="text-nowrap">
+                                {{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $badge }} status-chip">{{ $statusLabel }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-detail"
+                                            data-nama="{{ $item->pengguna->nama ?? '-' }}"
+                                            data-email="{{ $item->pengguna->email ?? '-' }}"
+                                            data-barang="{{ $item->barang->nama_barang ?? '-' }}"
+                                            data-kode="{{ $item->barang->kode_barang ?? '-' }}"
+                                            data-mulai="{{ \Carbon\Carbon::parse($item->waktu_awal)->translatedFormat('d M Y H:i') }}"
+                                            data-akhir="{{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}"
+                                            data-status="{{ ucfirst($item->status) }}"
+                                            data-qr="{{ $item->qr->qr_code ?? '-' }}"
+                                            data-qrpayload="{{ $item->qr->payload ?? '' }}"
+                                            data-riwayat="Peminjaman aktif. Riwayat perpanjangan: {{ $item->perpanjangan->count() }} kali. Keluhan: {{ $item->keluhan->count() }}.">
+                                        Detail
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+>>>>>>> e17174a0545b2a0e04f164f6a92a3ca46fb26a70
                         <tr>
                             <th>Nama Mahasiswa</th>
                             <th>Barang</th>
@@ -471,6 +582,10 @@
                                 <div class="mt-3">
                                     <div class="fw-semibold mb-1">QR / Kode Transaksi</div>
                                     <div id="detail-qr" class="text-monospace"></div>
+                                    <div class="mt-2 text-center">
+                                        <img id="detail-qr-img" src="" alt="QR Peminjaman" class="img-fluid rounded border" style="max-width: 180px; display:none;">
+                                        <div id="detail-qr-empty" class="text-muted small" style="display:none;">QR belum tersedia.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -504,6 +619,7 @@
             const qrReader = document.getElementById('qr-reader');
             let scanner = null;
             let isCameraActive = false;
+            let isSubmitting = false;
 
             function showToast(message, variant = 'success') {
                 const wrapper = document.createElement('div');
@@ -549,6 +665,17 @@
                 document.getElementById('detail-akhir').textContent = btn.dataset.akhir;
                 document.getElementById('detail-status').textContent = btn.dataset.status;
                 document.getElementById('detail-qr').textContent = btn.dataset.qr;
+                const img = document.getElementById('detail-qr-img');
+                const empty = document.getElementById('detail-qr-empty');
+                const payload = btn.dataset.qrpayload || '';
+                if (payload) {
+                    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payload)}`;
+                    img.style.display = 'block';
+                    empty.style.display = 'none';
+                } else {
+                    img.style.display = 'none';
+                    empty.style.display = 'block';
+                }
                 document.getElementById('detail-riwayat').textContent = btn.dataset.riwayat;
             }
 
@@ -630,6 +757,41 @@
                 return found;
             }
 
+            async function activateViaApi(qrCode) {
+                if (isSubmitting) return;
+                isSubmitting = true;
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                try {
+                    const res = await fetch('{{ route('petugas.peminjaman.activate') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ qr_code: qrCode }),
+                    });
+
+                    if (!res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        throw new Error(data.message || 'QR tidak valid atau peminjaman tidak ditemukan');
+                    }
+
+                    showToast('Peminjaman diaktifkan. Memuat ulang...', 'success');
+
+                    // Segera ubah badge di tabel (jika ada) sambil menunggu reload.
+                    markAsScanned(qrCode);
+
+                    setTimeout(() => window.location.reload(), 600);
+                } catch (err) {
+                    console.error(err);
+                    showToast(err.message, 'danger');
+                } finally {
+                    isSubmitting = false;
+                }
+            }
+
             scanBtn?.addEventListener('click', () => {
                 const qrCode = scanInput.value.trim();
                 if (!qrCode) {
@@ -637,21 +799,10 @@
                     return;
                 }
 
-                const ok = markAsScanned(qrCode);
-                if (ok) {
-                    showToast('QR valid. Status berubah menjadi Dipinjam.', 'success');
-                } else {
-                    showToast('QR tidak ditemukan pada daftar aktif.', 'danger');
-                }
+                activateViaApi(qrCode);
                 scanInput.value = '';
             });
 
-            document.querySelectorAll('.btn-scan-attach').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    scanInput.value = btn.dataset.qr;
-                    scanBtn.click();
-                });
-            });
         });
     </script>
 
@@ -1221,9 +1372,13 @@ body.sipkam-dark .btn-peminjaman-primary:hover {
                         @forelse($peminjaman as $item)
                             @php
                                 $status = $item->status;
-                                $badge = $status === 'berlangsung'
-                                    ? 'info'
-                                    : ($status === 'selesai' ? 'success' : 'danger');
+                                $badge = match ($status) {
+                                    'berlangsung' => 'info',
+                                    'selesai'     => 'success',
+                                    'booking'     => 'warning',
+                                    'dibatalkan'  => 'secondary',
+                                    default       => 'danger',
+                                };
                             @endphp
                             <tr>
                                 <td class="col-kode">#{{ $item->id_peminjaman }}</td>
@@ -1238,10 +1393,22 @@ body.sipkam-dark .btn-peminjaman-primary:hover {
                                     <span class="badge bg-{{ $badge }}">{{ ucfirst($status) }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('mahasiswa.peminjaman.show', $item->id_peminjaman) }}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Detail
-                                    </a>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('mahasiswa.peminjaman.show', $item->id_peminjaman) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Detail
+                                        </a>
+                                        @if($status === 'booking')
+                                            <form method="POST"
+                                                  action="{{ route('mahasiswa.peminjaman.cancel', $item->id_peminjaman) }}"
+                                                  onsubmit="return confirm('Batalkan booking ini?');">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Batal
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

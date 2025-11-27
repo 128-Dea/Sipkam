@@ -10,6 +10,7 @@
         --notif-light:  #DAF1DE;
     }
 
+<<<<<<< HEAD
     /* ============================
        WRAPPER BACKGROUND GRADIENT
        ============================ */
@@ -153,6 +154,24 @@
         <div class="notif-header-block mb-0">
             <div class="notif-header-icon">
                 <i class="bi bi-bell"></i>
+=======
+<div class="card border-0 shadow-sm">
+    <div class="list-group list-group-flush">
+        @forelse($notifikasi as $item)
+            <div class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="mb-1">{{ $item->judul ?? 'Notifikasi' }}</h6>
+                    <p class="mb-1">{{ $item->pesan ?? '-' }}</p>
+                    @if(auth()->user()?->role !== 'petugas')
+                        <small class="text-muted">Barang: {{ $item->barang->nama_barang ?? '-' }} | Pengguna: {{ $item->pengguna->nama ?? '-' }}</small>
+                    @endif
+                </div>
+                <form action="{{ route((auth()->user()?->role === 'petugas' ? 'petugas.notifikasi.destroy' : 'mahasiswa.notifikasi.destroy'), $item->id_notifikasi) }}" method="POST" onsubmit="return confirm('Hapus notifikasi ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                </form>
+>>>>>>> e17174a0545b2a0e04f164f6a92a3ca46fb26a70
             </div>
             <div class="notif-header-title">
                 <h1>Notifikasi Sistem</h1>

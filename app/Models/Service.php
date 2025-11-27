@@ -16,7 +16,7 @@ class Service extends Model
     protected $fillable = [
         'id_keluhan',
         'id_barang',
-        'status',              // proses / selesai
+        'status',              // mengantri / diperbaiki / selesai
         'tgl_masuk_service',   // tanggal barang masuk service
         'estimasi_selesai',    // estimasi selesai service
     ];
@@ -34,5 +34,14 @@ class Service extends Model
     public function barang(): BelongsTo
     {
         return $this->belongsTo(Barang::class, 'id_barang', 'id_barang');
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $service) {
+            if (empty($service->tgl_masuk_service)) {
+                $service->tgl_masuk_service = now();
+            }
+        });
     }
 }

@@ -19,12 +19,6 @@ return new class extends Migration
                 ->after('alasan');
         });
 
-        Schema::table('serah_terima', function (Blueprint $table) {
-            $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])
-                ->default('menunggu')
-                ->after('catatan');
-        });
-
         Schema::table('barang', function (Blueprint $table) {
             $table->bigInteger('harga')->nullable()->after('kode_barang');
         });
@@ -39,10 +33,6 @@ return new class extends Migration
 
         Schema::table('peminjaman', function (Blueprint $table) {
             $table->dropColumn('status');
-        });
-
-        Schema::table('serah_terima', function (Blueprint $table) {
-            $table->dropColumn('status_persetujuan');
         });
 
         Schema::table('barang', function (Blueprint $table) {

@@ -15,7 +15,6 @@ class Riwayat extends Model
 
     protected $fillable = [
         'id_pengembalian',
-        'serah_terima',
         'denda',
     ];
 

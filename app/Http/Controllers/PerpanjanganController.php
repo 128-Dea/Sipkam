@@ -79,10 +79,10 @@ class PerpanjanganController extends Controller
             }
         });
 
-        // Notifikasi petugas tentang pengajuan perpanjangan
+        // Notifikasi petugas tentang pengajuan perpanjangan (gunakan id_pengguna peminjam agar tidak NULL)
         \App\Models\Notifikasi::create([
             'id_barang'   => $peminjaman->id_barang,
-            'id_pengguna' => $peminjaman->pengguna?->id_pengguna, // simpan siapa pengaju agar nama terbaca
+            'id_pengguna' => null, // target petugas
             'jenis'       => 'perpanjangan_diajukan',
             'pesan'       => sprintf(
                 'Perpanjangan diajukan oleh %s untuk %s (PINJ#%d) sampai %s. Status awal: %s.',

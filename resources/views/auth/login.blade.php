@@ -1,432 +1,407 @@
-<x-guest-layout>
-    {{-- THEME LOGIN SIPKAM (HIJAU TEAL) --}}
-    <style>
-        :root {
-            --login-dark-1: #051F20;
-            --login-dark-2: #0B2B26;
-            --login-dark-3: #163832;
-            --login-soft:   #8EB69B;
-            --login-light:  #DAF1DE;
-        }
+@extends('layouts.app')
 
-        /* ===== BACKGROUND FULL PAGE ===== */
-        body {
-            background:
-                radial-gradient(circle at 15% 25%, rgba(218, 241, 222, 0.55), transparent 55%),
-                radial-gradient(circle at 85% 75%, rgba(142, 182, 155, 0.6), transparent 55%),
-                linear-gradient(180deg, var(--login-light) 0%, var(--login-dark-3) 100%) !important;
-            background-attachment: fixed;
-        }
+@section('content')
+@php
+    $scope = auth()->user()?->role === 'petugas' ? 'petugas' : 'mahasiswa';
+    $isPetugas = $scope === 'petugas';
+@endphp
 
-        /* ===== BRAND SIPKAM DI ATAS (LOGO + TITLE + SUBTITLE) ===== */
-        /* Umumnya judul SIPKAM pakai .text-primary, subtitle pakai .text-muted */
-        body .text-primary {
-            /* judul SIPKAM => hijau gelap */
-            color: #163832 !important;
-        }
+<style>
+    :root {
+        /* Palet tema referensi */
+        --theme-dark:      #051F20;
+        --theme-dark-soft: #0B2B26;
+        --theme-mid:       #163832;
+        --theme-edge:      #253547;
+        --theme-accent:    #8EB69B;
+        --theme-light:     #DAF1DE;
+        --theme-text-light:#ffffff;
+    }
 
-        body .text-muted {
-            /* subtitle & teks kecil => hijau lebih soft */
-            color: #235347 !important;
-        }
+    /* ============================
+       WRAPPER DENGAN GRADIENT
+       ============================ */
+    .keluhan-wrapper {
+        margin: -24px -32px -24px -32px;
+        padding: 32px 32px 48px;
+        min-height: calc(100vh - 64px);
+        background:
+            radial-gradient(
+                circle at 50% 120%,
+                var(--theme-light) 0,
+                var(--theme-accent) 30%,
+                var(--theme-mid) 70%,
+                var(--theme-dark) 100%
+            );
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-        /* Wrapper putih default dari layout (bg-white) disamakan dengan background */
-        body .bg-white {
-            background-color: transparent !important;
-            box-shadow: none !important;
-            border: 0 !important;
-        }
+    /* container biar header & card selalu satu kolom rapi di tengah */
+    .keluhan-inner {
+        width: 100%;
+        max-width: 1150px;
+    }
 
-        /* ===== KARTU LOGIN UTAMA ===== */
-        .sipkam-auth-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 32px 0 40px;
+    @media(max-width: 767.98px){
+        .keluhan-wrapper {
+            margin: -16px -16px -16px -16px;
+            padding: 20px 16px 32px;
         }
-
-        .sipkam-auth-card {
-            position: relative;
-            width: 100%;
-            max-width: 420px;
-            background: linear-gradient(145deg, rgba(5, 31, 32, 0.98), rgba(11, 43, 38, 0.98));
-            border-radius: 22px;
-            padding: 28px 26px 24px;
-            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
-            color: #EAF7EF;
+        .keluhan-inner {
+            max-width: 100%;
         }
+    }
 
-        /* Garis gradasi tipis di atas kartu */
-        .sipkam-auth-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            height: 4px;
-            border-radius: 22px 22px 0 0;
-            background: linear-gradient(90deg, var(--login-soft), var(--login-light), #235347);
+    /* ============================
+       HEADER GELAP (judul + filter)
+       ============================ */
+    .keluhan-header-block {
+        width: 100%;
+        background: linear-gradient(135deg, var(--theme-dark), var(--theme-mid));
+        color: var(--theme-text-light);
+        padding: 22px 26px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 18px 32px rgba(5, 31, 32, 0.55);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .keluhan-header-block h1 {
+        color: var(--theme-light) !important;
+        font-weight: 650;
+        font-size: 1.8rem;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+
+    .keluhan-header-block .text-muted {
+        color: rgba(218, 241, 222, 0.9) !important;
+    }
+
+    @media(max-width: 767.98px){
+        .keluhan-header-block {
+            padding: 18px 16px;
+            border-radius: 16px 16px 0 0;
         }
+    }
 
-        .sipkam-auth-card .text-primary {
-            color: var(--login-light) !important;
+    /* ============================
+       CARD TABEL PUTIH
+       ============================ */
+    .keluhan-card {
+        width: 100%;
+        border-radius: 0 0 20px 20px;
+        border: none;
+        box-shadow: 0 22px 44px rgba(5, 31, 32, 0.5);
+        overflow: hidden;
+        margin-top: -1px; /* nempel mulus ke header */
+        background: #ffffff;
+    }
+
+    @media(max-width: 767.98px){
+        .keluhan-card {
+            border-radius: 0 0 16px 16px;
         }
+    }
 
-        .sipkam-auth-card .text-muted {
-            color: rgba(218, 241, 222, 0.75) !important;
-        }
+    .keluhan-table thead th {
+        background-color: var(--theme-dark-soft);
+        color: #f9fafb;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: none;
+        padding: 14px 14px;
+    }
 
-        .sipkam-auth-card .form-label-modern {
-            font-size: 0.82rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: rgba(218, 241, 222, 0.8);
-        }
+    .keluhan-table tbody td {
+        padding: 14px 14px;
+        font-size: 0.95rem;
+        color: var(--theme-mid);
+    }
 
-        .sipkam-auth-card .form-control-modern {
-            border-radius: 14px;
-            border: 1px solid rgba(142, 182, 155, 0.55);
-            background: rgba(4, 29, 31, 0.92);
-            color: #EAF7EF;
-            font-size: 0.95rem;
-        }
+    .keluhan-table tbody tr:hover {
+        background-color: #ecf4ee;
+    }
 
-        .sipkam-auth-card .form-control-modern::placeholder {
-            color: rgba(218, 241, 222, 0.55);
-        }
+    /* ============================
+       FILTER & FORM DI HEADER
+       ============================ */
+    .form-control-dark {
+        background-color: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.35);
+        color: #e9f7f0;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
 
-        .sipkam-auth-card .form-control-modern:focus {
-            outline: none;
-            border-color: var(--login-soft);
-            box-shadow: 0 0 0 1px rgba(142, 182, 155, 0.45);
-        }
+    .form-control-dark:focus {
+        background-color: rgba(255,255,255,0.16);
+        border-color: rgba(255,255,255,0.75);
+        color: #ffffff;
+        box-shadow: none;
+    }
 
-        .sipkam-auth-card .input-group .btn {
-            border-radius: 14px;
-            border-color: rgba(142, 182, 155, 0.7);
-            background: rgba(4, 29, 31, 0.95);
-            color: var(--login-light);
-        }
+    .form-control-dark option {
+        background-color: var(--theme-dark);
+        color: #f9fafb;
+    }
 
-        .sipkam-auth-card .input-group .btn:hover {
-            background: rgba(8, 45, 45, 1);
-        }
+    .btn-filter-dark {
+        background: linear-gradient(135deg, var(--theme-mid), var(--theme-dark-soft));
+        border: 1px solid rgba(255,255,255,0.35);
+        color: #e9f7f0;
+        border-radius: 10px;
+        padding-inline: 16px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
 
-        .sipkam-auth-card .form-check-label {
-            color: rgba(218, 241, 222, 0.8);
-        }
+    .btn-filter-dark:hover {
+        background: linear-gradient(135deg, var(--theme-accent), var(--theme-light));
+        color: var(--theme-dark);
+        border-color: rgba(218,241,222,0.9);
+    }
 
-        /* TOMBOL UTAMA */
-        .sipkam-auth-card .btn-modern.btn-modern-primary {
-            background: linear-gradient(135deg, #235347, var(--login-dark-1));
-            border-radius: 999px;
-            border: none;
-            color: #EAF7EF;
-            box-shadow: 0 10px 25px rgba(5, 31, 32, 0.55);
-        }
+    /* ============================
+       BADGE & MODAL
+       ============================ */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
 
-        .sipkam-auth-card .btn-modern.btn-modern-primary:hover {
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-        }
+    #detailModal .modal-header {
+        background: linear-gradient(135deg, var(--theme-dark), var(--theme-mid));
+    }
 
-        /* QUICK ACTION BUTTONS */
-        .sipkam-auth-card .btn-outline-info,
-        .sipkam-auth-card .btn-outline-secondary {
-            border-radius: 999px;
-            border-color: rgba(142, 182, 155, 0.7);
-            color: var(--login-light);
-            background: transparent;
-        }
+    #detailModal .modal-body {
+        background: #f3faf6;
+    }
+</style>
 
-        .sipkam-auth-card .btn-outline-info:hover,
-        .sipkam-auth-card .btn-outline-secondary:hover {
-            background: rgba(142, 182, 155, 0.2);
-            color: #EAF7EF;
-        }
+<div class="keluhan-wrapper">
+    <div class="keluhan-inner">
 
-        /* Spinner loading */
-        .sipkam-auth-card .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border-radius: 999px;
-            border: 2px solid rgba(218, 241, 222, 0.4);
-            border-top-color: var(--login-light);
-            animation: sipkam-spin 0.8s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 6px;
-        }
-
-        @keyframes sipkam-spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 575.98px) {
-            .sipkam-auth-wrapper {
-                padding: 20px 0 28px;
-            }
-            .sipkam-auth-card {
-                padding: 22px 18px 20px;
-            }
-        }
-    </style>
-
-    <div class="sipkam-auth-wrapper">
-        <div class="sipkam-auth-card">
-            <div class="text-center mb-4">
-                <h2 class="h4 fw-bold text-primary mb-2">
-                    <i class="fas fa-graduation-cap me-2"></i>Selamat Datang Kembali
-                </h2>
-                <p class="text-muted small">Masuk ke akun Anda untuk melanjutkan</p>
+        {{-- HEADER --}}
+        <div class="keluhan-header-block">
+            <div>
+                <h1 class="h3 mb-1">{{ $isPetugas ? 'Keluhan Barang' : 'Keluhan Mahasiswa' }}</h1>
+                <small class="text-muted">
+                    {{ $isPetugas ? 'Pantau laporan mahasiswa dan tindak lanjuti' : 'Kelola laporan gangguan selama peminjaman' }}
+                </small>
             </div>
-
-            <form method="POST" action="{{ route('login') }}" id="loginForm">
-                @csrf
-
-                <!-- Email -->
-                <div class="mb-3">
-                    <label for="email" class="form-label-modern fw-semibold">
-                        <i class="fas fa-envelope me-2"></i>Email
-                    </label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}"
-                           class="form-control-modern @error('email') is-invalid @enderror"
-                           placeholder="nama@domain.ac.id" required autofocus>
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Gunakan email resmi kampus
-                    </small>
-                    @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <!-- Password -->
-                <div class="mb-3">
-                    <label for="password" class="form-label-modern fw-semibold">
-                        <i class="fas fa-lock me-2"></i>Password
-                    </label>
-                    <div class="input-group">
-                        <input id="password" type="password" name="password"
-                               class="form-control-modern @error('password') is-invalid @enderror"
-                               placeholder="Masukkan password Anda" required>
-                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <!-- Remember Me & Forgot Password -->
-                <div class="mb-4 d-flex justify-content-between align-items-center">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="1" id="remember_me" name="remember">
-                        <label class="form-check-label text-muted small" for="remember_me">
-                            <i class="fas fa-clock me-1"></i>Ingat saya
-                        </label>
-                    </div>
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-decoration-none small text-primary fw-semibold">
-                            <i class="fas fa-key me-1"></i>Lupa password?
-                        </a>
-                    @endif
-                </div>
-
-                <!-- Tombol Login -->
-                <div class="d-grid mb-3">
-                    <button type="submit" class="btn-modern btn-modern-primary btn-lg fw-semibold">
-                        <i class="fas fa-sign-in-alt me-2"></i>Masuk
-                    </button>
-                </div>
-
-                <!-- Link ke Register -->
-                <div class="text-center mb-3">
-                    <p class="mb-0 text-muted">Belum punya akun?
-                        <a href="{{ route('register') }}" class="text-decoration-none fw-semibold text-primary">
-                            <i class="fas fa-user-plus me-1"></i>Daftar sekarang
-                        </a>
-                    </p>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="text-center">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-info btn-sm w-100" data-bs-toggle="modal" data-bs-target="#helpModal">
-                                <i class="fas fa-question-circle me-1"></i>Bantuan
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-outline-secondary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#statusModal">
-                                <i class="fas fa-search me-1"></i>Cek Status
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-question-circle text-info me-2"></i>Bantuan Login
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-graduation-cap me-2"></i>Mahasiswa
-                            </h6>
-                            <ul class="list-unstyled small">
-                                <li class="mb-2">
-                                    <i class="fas fa-envelope text-muted me-2"></i>
-                                    Email: nama@mhs.unesa.ac.id
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-key text-muted me-2"></i>
-                                    Password: Sesuai yang didaftarkan
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-info-circle text-muted me-2"></i>
-                                    Status: Aktif setelah verifikasi
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-user-shield me-2"></i>Petugas
-                            </h6>
-                            <ul class="list-unstyled small">
-                                <li class="mb-2">
-                                    <i class="fas fa-envelope text-muted me-2"></i>
-                                    Email: nama@admin.ac.id
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-key text-muted me-2"></i>
-                                    Password: Diberikan admin
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-info-circle text-muted me-2"></i>
-                                    Status: Aktif setelah aktivasi
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="alert alert-info small mb-0">
-                        <i class="fas fa-lightbulb me-2"></i>
-                        <strong>Tips:</strong> Jika lupa password, klik "Lupa password?" untuk reset.
-                        Untuk bantuan lebih lanjut, hubungi admin sistem.
-                    </div>
-                </div>
+            <div class="d-flex gap-2">
+                <form method="GET" class="d-flex gap-2">
+                    <select name="status" class="form-select form-control-dark">
+                        <option value="">Semua Status</option>
+                        <option value="pending"   {{ request('status') === 'pending' ? 'selected' : '' }}>🕓 Pending</option>
+                        <option value="ditangani" {{ request('status') === 'ditangani' ? 'selected' : '' }}>🔧 Ditangani</option>
+                        <option value="selesai"   {{ request('status') === 'selesai' ? 'selected' : '' }}>✔️ Selesai</option>
+                    </select>
+                    <button class="btn btn-filter-dark" type="submit">Filter</button>
+                </form>
+                @if(!$isPetugas)
+                    <a href="{{ route($scope . '.keluhan.create') }}"
+                       class="btn"
+                       style="background: linear-gradient(135deg, var(--theme-accent), var(--theme-light)); color: var(--theme-dark); border-radius: 999px; border: 1px solid rgba(142,182,155,0.8); font-weight:600;">
+                        Laporkan
+                    </a>
+                @endif
             </div>
         </div>
-    </div>
 
-    <!-- Status Check Modal -->
-    <div class="modal fade" id="statusModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-search text-secondary me-2"></i>Cek Status Akun
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="statusForm">
-                        <div class="mb-3">
-                            <label class="form-label-modern">
-                                <i class="fas fa-envelope me-2"></i>Email
-                            </label>
-                            <input type="email" class="form-control-modern" id="statusEmail"
-                                   placeholder="Masukkan email yang digunakan mendaftar" required>
+        {{-- CARD TABEL --}}
+        <div class="card keluhan-card">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 keluhan-table">
+                    <thead>
+                        <tr>
+                            @if($isPetugas)
+                                <th>Nama Mahasiswa</th>
+                                <th>Barang</th>
+                                <th>Tanggal Keluhan</th>
+                                <th>Isi / Detail</th>
+                                <th>Status</th>
+                                <th class="text-center">Aksi</th>
+                            @else
+                                <th>ID</th>
+                                <th>Foto</th>
+                                <th>Barang</th>
+                                <th>Keluhan</th>
+                                <th>Pelapor</th>
+                                <th>Tanggal</th>
+                                <th></th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($keluhan as $item)
+                            @if($isPetugas)
+                                @php
+                                    $status = $item->status ?? 'pending';
+                                    $label = $status === 'ditangani' ? '🔧 Ditangani' : ($status === 'selesai' ? '✔️ Selesai' : '🕓 Pending');
+                                    $badge = $status === 'ditangani' ? 'warning' : ($status === 'selesai' ? 'success' : 'secondary');
+                                @endphp
+                                <tr data-row
+                                    data-nama="{{ $item->pengguna->nama ?? '-' }}"
+                                    data-email="{{ $item->pengguna->email ?? '-' }}"
+                                    data-barang="{{ $item->peminjaman->barang->nama_barang ?? '-' }}"
+                                    data-keluhan="{{ $item->keluhan }}"
+                                    data-tanggal="{{ optional($item->created_at)->translatedFormat('d M Y H:i') ?? '-' }}"
+                                    data-status="{{ ucfirst($status) }}"
+                                    data-foto="{{ $item->foto_url ?? '' }}"
+                                    data-tindak="{{ $item->tindak_lanjut ?? '-' }}"
+                                >
+                                    <td class="fw-medium">{{ $item->pengguna->nama ?? '-' }}</td>
+                                    <td>{{ $item->peminjaman->barang->nama_barang ?? '-' }}</td>
+                                    <td class="text-nowrap text-muted small">{{ optional($item->created_at)->translatedFormat('d M Y') ?? '-' }}</td>
+                                    <td class="text-muted">{{ \Illuminate\Support\Str::limit($item->keluhan, 80) }}</td>
+                                    <td><span class="badge bg-{{ $badge }}">{{ $label }}</span></td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                            <button class="btn btn-sm btn-outline-success btn-detail">Detail</button>
+                                            @if($status === 'pending')
+                                                <form method="POST" action="{{ route('petugas.keluhan.service', $item->id_keluhan) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-warning">📩 Service</button>
+                                                </form>
+                                            @endif
+                                            @if(in_array($status, ['pending','ditangani']))
+                                                <form method="POST" action="{{ route('petugas.keluhan.selesai', $item->id_keluhan) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-primary">✔️ Selesai</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @else
+                                <tr>
+                                    <td>{{ $item->id_keluhan }}</td>
+                                    <td style="width: 100px;">
+                                        @if($item->foto_url)
+                                            <img src="{{ $item->foto_url }}" alt="Foto keluhan"
+                                                 class="img-thumbnail" style="max-height:60px;object-fit:cover;">
+                                        @else
+                                            <span class="text-muted small">No IMG</span>
+                                        @endif
+                                    </td>
+                                    <td class="fw-medium">{{ $item->peminjaman->barang->nama_barang ?? '-' }}</td>
+                                    <td class="text-muted">{{ Str::limit($item->keluhan, 50) }}</td>
+                                    <td>{{ $item->pengguna->nama ?? '-' }}</td>
+                                    <td>{{ optional($item->created_at)->format('d M Y') ?? '-' }}</td>
+                                    <td>
+                                        <a href="{{ route($scope . '.keluhan.show', $item->id_keluhan) }}"
+                                           class="btn btn-sm btn-outline-success">
+                                            Detail
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endif
+                        @empty
+                            <tr>
+                                <td colspan="{{ $isPetugas ? 6 : 7 }}" class="text-center py-5">
+                                    <div class="text-muted" style="opacity: 0.7;">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        Belum ada keluhan yang masuk.
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{-- MODAL DETAIL (LOGIKA TIDAK DIUBAH) --}}
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-white" style="background-color: var(--theme-dark);">
+                <h5 class="modal-title">Detail Keluhan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-white shadow-sm h-100 border">
+                            <div class="fw-semibold mb-1 text-success">Mahasiswa</div>
+                            <div id="d-nama" class="fs-5 text-dark"></div>
+                            <small class="text-muted" id="d-email"></small>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn-modern btn-modern-primary">
-                                <i class="fas fa-search me-2"></i>Cek Status
-                            </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-white shadow-sm h-100 border">
+                            <div class="fw-semibold mb-1 text-success">Barang</div>
+                            <div id="d-barang" class="fs-5 text-dark"></div>
+                            <small class="text-muted" id="d-status"></small>
                         </div>
-                    </form>
-                    <div id="statusResult" class="mt-3" style="display: none;"></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-4 rounded bg-white shadow-sm border">
+                            <div class="fw-semibold mb-2 text-success">Deskripsi Keluhan</div>
+                            <p class="mb-0 text-secondary" id="d-keluhan" style="line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded bg-white shadow-sm h-100 border">
+                            <div class="fw-semibold mb-1 text-success">Tanggal Keluhan</div>
+                            <div id="d-tanggal" class="mb-3"></div>
+                            <div class="fw-semibold mb-1 text-success">Tindak Lanjut</div>
+                            <p class="text-muted mb-0" id="d-tindak"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="d-foto-wrap" style="display:none;">
+                        <div class="p-3 rounded bg-white shadow-sm h-100 text-center border">
+                            <div class="fw-semibold mb-2 text-success">Foto Keluhan</div>
+                            <img id="d-foto" src="" alt="Foto keluhan" class="img-fluid rounded" style="max-height: 200px;">
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password');
-            const togglePassword = document.getElementById('togglePassword');
-            const loginForm = document.getElementById('loginForm');
-            const statusForm = document.getElementById('statusForm');
-            const statusResult = document.getElementById('statusResult');
-
-            // Toggle password visibility
-            togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
-
-            // Login form submission
-            loginForm.addEventListener('submit', function(e) {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<span class="loading-spinner"></span> Sedang masuk...';
-                submitBtn.disabled = true;
-
-                // Re-enable after 3 seconds if no response (fallback)
-                setTimeout(() => {
-                    if (submitBtn.disabled) {
-                        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Masuk';
-                        submitBtn.disabled = false;
-                    }
-                }, 3000);
-            });
-
-            // Status check form
-            statusForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const email = document.getElementById('statusEmail').value;
-                const submitBtn = this.querySelector('button[type="submit"]');
-
-                submitBtn.innerHTML = '<span class="loading-spinner"></span> Mencari...';
-                submitBtn.disabled = true;
-
-                setTimeout(() => {
-                    statusResult.style.display = 'block';
-                    statusResult.innerHTML = `
-                        <div class="alert alert-info small">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Informasi Status:</strong><br>
-                            Email: ${email}<br>
-                            Status: <span class="badge bg-warning">Menunggu Verifikasi</span><br>
-                            <small class="text-muted">Akun Anda sedang dalam proses verifikasi oleh admin. Silakan tunggu 1-2 hari kerja.</small>
-                        </div>
-                    `;
-
-                    submitBtn.innerHTML = '<i class="fas fa-search me-2"></i>Cek Status';
-                    submitBtn.disabled = false;
-                }, 1500);
-            });
-
-            // Auto-focus email field
-            document.getElementById('email').focus();
-
-            // Enter key navigation
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    const activeElement = document.activeElement;
-                    if (activeElement.id === 'email') {
-                        document.getElementById('password').focus();
-                    }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+        document.querySelectorAll('[data-row] .btn-detail').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const row = btn.closest('tr');
+                document.getElementById('d-nama').textContent = row.dataset.nama;
+                document.getElementById('d-email').textContent = row.dataset.email;
+                document.getElementById('d-barang').textContent = row.dataset.barang;
+                document.getElementById('d-status').textContent = row.dataset.status;
+                document.getElementById('d-keluhan').textContent = row.dataset.keluhan;
+                document.getElementById('d-tanggal').textContent = row.dataset.tanggal;
+                document.getElementById('d-tindak').textContent = row.dataset.tindak;
+                const foto = row.dataset.foto;
+                const wrap = document.getElementById('d-foto-wrap');
+                if (foto) {
+                    document.getElementById('d-foto').src = foto;
+                    wrap.style.display = '';
+                } else {
+                    wrap.style.display = 'none';
                 }
+                detailModal.show();
             });
         });
-    </script>
-</x-guest-layout>
+    });
+</script>
+@endsection

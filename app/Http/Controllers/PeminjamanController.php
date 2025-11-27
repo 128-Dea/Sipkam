@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Pengguna;
 use App\Models\Peminjaman;
+use App\Models\Pengembalian;
+use App\Models\Riwayat;
 use App\Models\Qr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PeminjamanController extends Controller
@@ -23,7 +26,7 @@ class PeminjamanController extends Controller
             $penggunaId = $this->resolvePenggunaId($user);
             if ($penggunaId) {
                 $query->where('id_pengguna', $penggunaId)
-                    ->where('status', '!=', 'selesai');
+                    ->where('status', 'berlangsung');
             }
         }
 
@@ -52,12 +55,19 @@ class PeminjamanController extends Controller
 
         $prefillBarangId = $request->query('barang_id');
 
-        $barang = Barang::with('kategori')
-            ->where(function ($q) {
-                $q->whereNull('stok')->orWhere('stok', '>', 0);
-            })
-            ->where('status', 'tersedia')
-            ->get();
+        // Ambil semua barang + relasi agar status_otomatis akurat, lalu filter yang benar-benar tersedia.
+        $barang = Barang::with(['kategori', 'peminjaman'])
+            ->get()
+            ->filter(fn (Barang $item) => $item->status_otomatis === 'tersedia')
+            ->values();
+
+        // Jika datang dari tombol "Pinjam Sekarang", pastikan barang prefill tetap ada dalam list.
+        if ($prefillBarangId && !$barang->firstWhere('id_barang', (int) $prefillBarangId)) {
+            $prefill = Barang::with(['kategori', 'peminjaman'])->find($prefillBarangId);
+            if ($prefill && $prefill->status_otomatis === 'tersedia') {
+                $barang->prepend($prefill);
+            }
+        }
 
         return view('peminjaman.create', [
             'barang' => $barang,
@@ -148,6 +158,55 @@ public function show(Peminjaman $peminjaman)
     }
 
     /**
+     * Batalkan booking oleh mahasiswa sebelum diaktivasi petugas.
+     */
+    public function cancel(Peminjaman $peminjaman)
+    {
+        $user = auth()->user();
+        abort_unless($user && $user->role === 'mahasiswa', 403);
+
+        $penggunaId = $this->resolvePenggunaId($user);
+        abort_unless($penggunaId && $peminjaman->id_pengguna === $penggunaId, 403);
+
+        if ($peminjaman->status !== 'booking') {
+            return back()->with('error', 'Hanya booking yang belum aktif yang bisa dibatalkan.');
+        }
+
+        DB::transaction(function () use ($peminjaman, $user) {
+            $peminjaman->update(['status' => 'dibatalkan']);
+
+            // Nonaktifkan QR agar tidak bisa dipakai setelah dibatalkan.
+            if ($peminjaman->qr) {
+                $peminjaman->qr->update(['is_active' => false]);
+            }
+
+            // Kembalikan stok/ status barang jika kita sudah mengurangi saat booking dibuat.
+            $this->kembalikanBarangSetelahBatal($peminjaman->barang);
+
+            // Catat ke tabel pengembalian + riwayat agar tampil di histori.
+            if (!$peminjaman->pengembalian) {
+                $pengembalian = Pengembalian::create([
+                    'id_peminjaman'      => $peminjaman->id_peminjaman,
+                    'waktu_pengembalian' => now(),
+                    'catatan'            => sprintf(
+                        'Booking dibatalkan oleh %s',
+                        $user->name ?? 'mahasiswa'
+                    ),
+                ]);
+
+                Riwayat::create([
+                    'id_pengembalian' => $pengembalian->id_pengembalian,
+                    'denda'           => 0,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('mahasiswa.peminjaman.index')
+            ->with('success', 'Booking berhasil dibatalkan.');
+    }
+
+    /**
      * Aktifkan peminjaman dari hasil scan QR (petugas).
      * Mengubah status booking => berlangsung (aktif).
      */
@@ -211,6 +270,24 @@ public function show(Peminjaman $peminjaman)
             }
         } elseif (in_array($barang->status, ['tersedia', 'dipinjam'])) {
             $barang->update(['status' => 'dipinjam']);
+        }
+    }
+
+    protected function kembalikanBarangSetelahBatal(?Barang $barang): void
+    {
+        if (!$barang) {
+            return;
+        }
+
+        if (!is_null($barang->stok)) {
+            $barang->increment('stok');
+            $barang->refresh();
+
+            if (in_array($barang->status, ['tersedia', 'dipinjam'], true)) {
+                $barang->update(['status' => 'tersedia']);
+            }
+        } elseif (in_array($barang->status, ['dipinjam', 'tersedia'], true)) {
+            $barang->update(['status' => 'tersedia']);
         }
     }
 

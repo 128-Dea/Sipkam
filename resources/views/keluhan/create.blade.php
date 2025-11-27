@@ -264,15 +264,20 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label">Pilih Peminjaman</label>
-                    <select name="id_peminjaman" class="form-select" required>
+                    <select name="id_peminjaman" class="form-select" {{ $peminjaman->isEmpty() ? 'disabled' : '' }} required>
                         <option value="">-- Pilih --</option>
-                        @foreach($peminjaman as $item)
+                        @forelse($peminjaman as $item)
                             <option value="{{ $item->id_peminjaman }}" @selected(old('id_peminjaman')==$item->id_peminjaman)>
                                 {{ $item->barang->nama_barang ?? 'Barang' }} - {{ $item->pengguna->nama ?? 'Pengguna' }}
                             </option>
-                        @endforeach
+                        @empty
+                            <option value="">Tidak ada peminjaman yang sedang berlangsung.</option>
+                        @endforelse
                     </select>
                     @error('id_peminjaman')<small class="text-danger">{{ $message }}</small>@enderror
+                    @if($peminjaman->isEmpty())
+                        <small class="text-muted d-block mt-1">Anda hanya dapat melaporkan keluhan untuk peminjaman yang sedang berlangsung.</small>
+                    @endif
                 </div>
 
                 <div class="mb-3">

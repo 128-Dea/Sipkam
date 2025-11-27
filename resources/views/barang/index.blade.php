@@ -318,7 +318,7 @@
                             <option value="">Semua status</option>
                             <option value="tersedia" @selected($selectedStatus === 'tersedia')>Tersedia</option>
                             <option value="dipinjam" @selected($selectedStatus === 'dipinjam')>Sedang dipinjam</option>
-                            <option value="service"  @selected($selectedStatus === 'service')>Sedang service</option>
+                            <option value="dalam_service"  @selected($selectedStatus === 'dalam_service')>Sedang service</option>
                         </select>
                     </div>
 
@@ -410,7 +410,7 @@
                                         <span class="badge bg-success">Tersedia</span>
                                     @elseif($status === 'dipinjam')
                                         <span class="badge bg-warning text-dark">Sedang Dipinjam</span>
-                                    @elseif($status === 'service')
+                                    @elseif($status === 'dalam_service')
                                         <span class="badge bg-info text-dark">Sedang Service</span>
                                     @elseif($status === 'habis')
                                         <span class="badge bg-secondary">Stok Habis</span>
@@ -481,13 +481,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="card-footer small">
-                <strong>Keterangan:</strong>
-                <span class="ms-2">Stok Total = stok di database,</span>
-                <span class="ms-2">Tersedia = stok total − dipinjam − service.</span>
-            </div>
-        </div>
 
     @else
         {{-- ====== VIEW MAHASISWA / USER BIASA: KARTU BARANG ====== --}}
@@ -686,7 +679,7 @@
                                         <span class="badge bg-success">Tersedia</span>
                                     @elseif($statusUser === 'dipinjam')
                                         <span class="badge bg-warning text-dark">Sedang Dipinjam</span>
-                                    @elseif($statusUser === 'service')
+                                    @elseif($statusUser === 'dalam_service')
                                         <span class="badge bg-info text-dark">Sedang Service</span>
                                     @elseif($statusUser === 'habis')
                                         <span class="badge bg-secondary">Stok Habis</span>

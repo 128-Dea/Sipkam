@@ -782,7 +782,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('petugas.riwayat.*') ? 'active' : '' }}" href="{{ route('petugas.riwayat.index') }}">
                             <i class="fas fa-folder-open"></i>
-                            <span>Histori</span>
+                            <span>riwayat</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -832,9 +832,6 @@
                         <button class="btn btn-link text-decoration-none me-3" onclick="history.back()" title="Kembali">
                             <i class="fas fa-arrow-left fa-lg"></i>
                         </button>
-                        <h4 class="mb-0 fw-bold text-primary">
-                            @yield('page-title', 'Dashboard')
-                        </h4>
                     </div>
 
                     <div class="user-menu">
@@ -918,6 +915,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mahasiswa.booking.*') ? 'active' : '' }}" href="{{ route('mahasiswa.booking.index') }}">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Booking</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('mahasiswa.peminjaman.*') ? 'active' : '' }}" href="{{ route('mahasiswa.peminjaman.index') }}">
                             <i class="fas fa-hand-holding"></i>
                             <span>Peminjaman</span>
@@ -963,7 +966,7 @@
                     <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('mahasiswa.riwayat.*') ? 'active' : '' }}" href="{{ route('mahasiswa.riwayat.index') }}">
                         <i class="fas fa-history"></i>
-                        <span>Riwayat</span>
+                        <span>riwayat</span>
                     </a>
                 </li>
                 <li class="nav-item">

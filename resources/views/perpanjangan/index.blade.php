@@ -4,13 +4,34 @@
 @php
     $perpanjanganRouteScope = auth()->user()?->role === 'petugas' ? 'petugas' : 'mahasiswa';
 @endphp
+
+<style>
+    .btn-perpanjangan-primary {
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+        border: none !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: 0 12px 30px rgba(79,70,229,0.25);
+    }
+
+    .btn-perpanjangan-primary:hover {
+        color: #ffffff;
+        filter: brightness(1.05);
+    }
+
+    body.sipkam-dark .btn-perpanjangan-primary {
+        box-shadow: 0 12px 32px rgba(99,102,241,0.35);
+    }
+</style>
+
 <div class="d-flex justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1">Perpanjangan Peminjaman</h1>
         <small class="text-muted">Pantau status pengajuan perpanjangan</small>
     </div>
     @if($perpanjanganRouteScope === 'mahasiswa')
-        <a href="{{ route($perpanjanganRouteScope . '.perpanjangan.create') }}" class="btn btn-primary">Ajukan Perpanjangan</a>
+        <a href="{{ route($perpanjanganRouteScope . '.perpanjangan.create') }}" class="btn btn-perpanjangan-primary">Ajukan Perpanjangan</a>
     @endif
 </div>
 

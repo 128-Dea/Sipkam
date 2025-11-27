@@ -11,10 +11,25 @@
         --keluhan-accent: #3b82f6;
         --keluhan-accent-soft: rgba(59,130,246,0.18);
     }
+    .btn-keluhan-primary {
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+        border: none !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: 0 12px 30px rgba(79,70,229,0.25);
+    }
+    .btn-keluhan-primary:hover {
+        color: #ffffff !important;
+        filter: brightness(1.05);
+    }
+    body.sipkam-dark .btn-keluhan-primary {
+        box-shadow: 0 12px 32px rgba(99,102,241,0.35);
+    }
     .keluhan-wrapper {
         margin: -24px -32px -24px -32px;
         padding: 20px 32px 32px;
-        background: linear-gradient(135deg,#e0f2fe 0%,#f9fafb 45%,#dcfce7 100%);
+        background: #ffffff;
     }
     .keluhan-card {
         border-radius: 16px;
@@ -29,6 +44,34 @@
     }
     .keluhan-empty {
         padding: 2rem 0;
+    }
+    .keluhan-thumb {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .keluhan-thumb .thumb-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.25));
+    }
+    .keluhan-thumb .thumb-badge {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
+        background: rgba(0,0,0,0.65);
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        line-height: 1;
+        letter-spacing: 0.04em;
     }
     @media(max-width: 767.98px){
         .keluhan-wrapper { margin: -16px -16px -16px -16px; padding: 16px; }
@@ -56,7 +99,11 @@
                 </form>
             </div>
         @else
-            <a href="{{ route($scope . '.keluhan.create') }}" class="btn btn-primary">Laporkan Keluhan</a>
+            <a href="{{ route($scope . '.keluhan.create') }}"
+               class="btn btn-keluhan-primary"
+               style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); border: none; color: #ffffff;">
+                Laporkan Keluhan
+            </a>
         @endif
     </div>
 
@@ -85,6 +132,10 @@
                 </thead>
                 <tbody>
                     @forelse($keluhan as $item)
+                        @php
+                            $isVideo = $item->foto_url
+                                && \Illuminate\Support\Str::of($item->foto_url)->lower()->contains(['.mp4', '.mov', '.avi', '.webm']);
+                        @endphp
                         @if($isPetugas)
                             @php
                                 $status = $item->status ?? 'pending';
@@ -100,6 +151,7 @@
                                 data-status="{{ ucfirst($status) }}"
                                 data-foto="{{ $item->foto_url ?? '' }}"
                                 data-tindak="{{ $item->tindak_lanjut ?? '-' }}"
+                                data-is-video="{{ $isVideo ? '1' : '0' }}"
                             >
                                 <td>{{ $item->pengguna->nama ?? '-' }}</td>
                                 <td>{{ $item->peminjaman->barang->nama_barang ?? '-' }}</td>
@@ -129,10 +181,24 @@
                                 <td>{{ $item->id_keluhan }}</td>
                                 <td style="width: 100px;">
                                     @if($item->foto_url)
-                                        <img src="{{ $item->foto_url }}" alt="Foto keluhan"
-                                             class="img-thumbnail" style="max-height:60px;object-fit:cover;">
+                                        @if($isVideo)
+                                            <div class="keluhan-thumb" style="height:60px;">
+                                                <video src="{{ $item->foto_url }}"
+                                                       class="w-100 h-100"
+                                                       muted
+                                                       playsinline
+                                                       preload="metadata"
+                                                       style="object-fit:cover;">
+                                                </video>
+                                                <div class="thumb-overlay"></div>
+                                                <div class="thumb-badge">▶ Video</div>
+                                            </div>
+                                        @else
+                                            <img src="{{ $item->foto_url }}" alt="Foto keluhan"
+                                                 class="img-thumbnail" style="max-height:60px;object-fit:cover;">
+                                        @endif
                                     @else
-                                        <span class="text-muted small">Tidak ada foto</span>
+                                        <span class="text-muted small">Tidak ada lampiran</span>
                                     @endif
                                 </td>
                                 <td>{{ $item->peminjaman->barang->nama_barang ?? '-' }}</td>
@@ -197,10 +263,11 @@
                             <p class="text-muted mb-0" id="d-tindak"></p>
                         </div>
                     </div>
-                    <div class="col-md-6" id="d-foto-wrap" style="display:none;">
+                    <div class="col-md-6" id="d-lampiran-wrap" style="display:none;">
                         <div class="p-3 rounded bg-white shadow-sm h-100 text-center">
-                            <div class="fw-semibold mb-2">Foto Keluhan</div>
-                            <img id="d-foto" src="" alt="Foto keluhan" class="img-fluid rounded">
+                            <div class="fw-semibold mb-2">Lampiran Keluhan</div>
+                            <video id="d-video" class="img-fluid rounded mb-2" style="max-height:320px; display:none;" controls></video>
+                            <img id="d-foto" src="" alt="Lampiran keluhan" class="img-fluid rounded" style="display:none;">
                         </div>
                     </div>
                 </div>
@@ -226,12 +293,27 @@
                 document.getElementById('d-tanggal').textContent = row.dataset.tanggal;
                 document.getElementById('d-tindak').textContent = row.dataset.tindak;
                 const foto = row.dataset.foto;
-                const wrap = document.getElementById('d-foto-wrap');
+                const wrap = document.getElementById('d-lampiran-wrap');
+                const isVideo = row.dataset.isVideo === '1';
+                const videoEl = document.getElementById('d-video');
+                const imgEl = document.getElementById('d-foto');
                 if (foto) {
-                    document.getElementById('d-foto').src = foto;
+                    if (isVideo) {
+                        videoEl.src = foto;
+                        videoEl.style.display = '';
+                        imgEl.style.display = 'none';
+                        videoEl.load();
+                    } else {
+                        imgEl.src = foto;
+                        imgEl.style.display = '';
+                        videoEl.pause();
+                        videoEl.removeAttribute('src');
+                        videoEl.style.display = 'none';
+                    }
                     wrap.style.display = '';
                 } else {
                     wrap.style.display = 'none';
+                    videoEl.pause();
                 }
                 detailModal.show();
             });

@@ -15,6 +15,7 @@
 </div>
 
 <div class="card border-0 shadow-sm mb-3">
+    @if(auth()->user()?->role === 'petugas')
     <div class="card-body">
         <div class="d-flex align-items-center mb-3">
             <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-2" style="width:44px;height:44px;">
@@ -44,6 +45,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 <div class="card border-0 shadow-sm">
@@ -93,19 +95,31 @@
                             <span class="badge bg-{{ $badge }}">{{ $statusLabel }}</span>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary btn-detail"
-                                    data-nama="{{ $item->pengguna->nama ?? '-' }}"
-                                    data-email="{{ $item->pengguna->email ?? '-' }}"
-                                    data-barang="{{ $item->barang->nama_barang ?? '-' }}"
-                                    data-kode="{{ $item->barang->kode_barang ?? '-' }}"
-                                    data-mulai="{{ \Carbon\Carbon::parse($item->waktu_awal)->translatedFormat('d M Y H:i') }}"
-                                    data-akhir="{{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}"
-                                    data-status="{{ ucfirst($item->status) }}"
-                                    data-qr="{{ $item->qr->qr_code ?? '-' }}"
-                                    data-qr-svg="{{ $qrSvg }}"
-                                    data-riwayat="Booking dibuat dan menunggu scan QR.">
-                                Lihat Detail
-                            </button>
+                            <div class="d-flex flex-column gap-2 align-items-center">
+                                <button class="btn btn-sm btn-outline-primary btn-detail"
+                                        data-nama="{{ $item->pengguna->nama ?? '-' }}"
+                                        data-email="{{ $item->pengguna->email ?? '-' }}"
+                                        data-barang="{{ $item->barang->nama_barang ?? '-' }}"
+                                        data-kode="{{ $item->barang->kode_barang ?? '-' }}"
+                                        data-mulai="{{ \Carbon\Carbon::parse($item->waktu_awal)->translatedFormat('d M Y H:i') }}"
+                                        data-akhir="{{ \Carbon\Carbon::parse($item->waktu_akhir)->translatedFormat('d M Y H:i') }}"
+                                        data-status="{{ ucfirst($item->status) }}"
+                                        data-qr="{{ $item->qr->qr_code ?? '-' }}"
+                                        data-qr-svg="{{ $qrSvg }}"
+                                        data-riwayat="Booking dibuat dan menunggu scan QR.">
+                                    Lihat Detail
+                                </button>
+                                @if(auth()->user()?->role === 'mahasiswa' && $item->status === 'booking')
+                                    <form method="POST"
+                                          action="{{ route('mahasiswa.peminjaman.cancel', $item->id_peminjaman) }}"
+                                          onsubmit="return confirm('Batalkan booking ini? QR akan dinonaktifkan.');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Batalkan Booking
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -161,7 +175,7 @@
                                     <div id="detail-qr-code" class="bg-light rounded p-2 d-inline-flex justify-content-center align-items-center" style="min-width:160px;min-height:160px;"></div>
                                     <div>
                                         <div id="detail-qr" class="text-monospace small"></div>
-                                        <small class="text-muted d-block mt-1">Tunjukkan QR ini ke petugas untuk aktivasi peminjaman.</small>
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +183,7 @@
                     </div>
                     <div class="col-12">
                         <div class="p-3 rounded border bg-white shadow-sm">
-                            <div class="fw-semibold mb-1">Riwayat</div>
+                            <div class="fw-semibold mb-1">riwayat</div>
                             <p class="mb-0 text-muted" id="detail-riwayat"></p>
                         </div>
                     </div>

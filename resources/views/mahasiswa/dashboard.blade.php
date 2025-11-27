@@ -502,7 +502,7 @@
                     <div class="stat-overview mb-3">
                         <div class="item">
                             <div class="head">
-                                <span class="label">Riwayat selesai</span>
+                                <span class="label">riwayat selesai</span>
                                 <span class="icon text-success"><i class="fas fa-check-double"></i></span>
                             </div>
                             <span class="value text-success">{{ $riwayatSelesai }}</span>

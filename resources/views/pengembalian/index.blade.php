@@ -30,6 +30,13 @@
                         @php
                             $peminjaman = $item->peminjaman;
                             $totalDenda = $peminjaman?->denda?->sum('total_denda') ?? 0;
+                            $catatanAsli = $item->catatan ?? '-';
+                            $catatanBersih = preg_replace('/\\|\\s*Foto:\\s*[^|]+/i', '', $catatanAsli);
+                            $fotoPath = null;
+                            if (preg_match('/Foto:\\s*([^|]+)/i', $catatanAsli, $matches)) {
+                                $fotoPath = trim($matches[1]);
+                            }
+                            $fotoUrl = $fotoPath ? \Illuminate\Support\Facades\Storage::url($fotoPath) : '';
                         @endphp
                         <tr
                             data-row
@@ -40,7 +47,8 @@
                             data-pinjam="{{ optional($peminjaman?->waktu_awal ? \Carbon\Carbon::parse($peminjaman->waktu_awal) : null)?->translatedFormat('d M Y H:i') ?? '-' }}"
                             data-kembali="{{ optional($item->waktu_pengembalian)?->translatedFormat('d M Y H:i') ?? '-' }}"
                             data-denda="{{ $totalDenda > 0 ? 'Rp ' . number_format($totalDenda, 0, ',', '.') : 'Tidak ada' }}"
-                            data-catatan="{{ $item->catatan ?? '-' }}"
+                            data-catatan="{{ trim($catatanBersih) ?: '-' }}"
+                            data-foto="{{ $fotoUrl }}"
                         >
                             <td>#{{ $item->id_pengembalian }}</td>
                             <td>{{ $peminjaman->barang->nama_barang ?? '-' }}</td>
@@ -112,6 +120,7 @@
                             <div id="d-denda" class="fw-semibold text-danger"></div>
                             <div class="fw-semibold text-muted mt-3">Catatan</div>
                             <div id="d-catatan" class="text-muted"></div>
+                            <div id="d-foto" class="mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +148,22 @@
                 document.getElementById('d-kembali').textContent = row.dataset.kembali || '-';
                 document.getElementById('d-denda').textContent = row.dataset.denda || '-';
                 document.getElementById('d-catatan').textContent = row.dataset.catatan || '-';
+                const fotoContainer = document.getElementById('d-foto');
+                fotoContainer.innerHTML = '';
+                if (row.dataset.foto) {
+                    const img = document.createElement('img');
+                    img.src = row.dataset.foto;
+                    img.alt = 'Foto kerusakan';
+                    img.className = 'img-fluid rounded border';
+                    fotoContainer.appendChild(img);
+                    const link = document.createElement('a');
+                    link.href = row.dataset.foto;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'd-block small mt-2';
+                    link.textContent = 'Lihat ukuran penuh';
+                    fotoContainer.appendChild(link);
+                }
                 detailModal.show();
             });
         });

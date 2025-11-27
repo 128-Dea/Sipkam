@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<h1 class="h3 mb-4">Riwayat Peminjaman</h1>
+<h1 class="h3 mb-4">riwayat Peminjaman</h1>
 
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
@@ -41,7 +41,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted">Riwayat masih kosong.</td>
+                        <td colspan="6" class="text-center text-muted">riwayat masih kosong.</td>
                     </tr>
                 @endforelse
             </tbody>

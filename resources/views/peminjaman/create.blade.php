@@ -9,7 +9,7 @@
         margin: -1.5rem -1.5rem -1.5rem;
         padding: 1.5rem 1.5rem 2rem;
         min-height: calc(100vh - 72px);
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #0ea5e9 100%);
+        background: #ffffff;
     }
 
     @media (max-width: 768px) {
@@ -31,7 +31,7 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        color: #f9fafb;
+        color: #0f172a;
     }
 
     .peminjaman-header-bar small {
@@ -77,10 +77,10 @@
     form.peminjaman-form {
         width: 100%;
         border-radius: 18px;
-        border: none;
+        border: 1px solid rgba(148, 163, 184, 0.25);
         overflow: hidden;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #0ea5e9 100%);
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+        background: #ffffff;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
         color: #0f172a;
     }
 
@@ -95,7 +95,7 @@
     /* Body & footer form transparan supaya gradasi/warna dasar terlihat */
     form.peminjaman-form .card-body,
     form.peminjaman-form .card-footer {
-        background: transparent;
+        background: #ffffff;
     }
 
     form.peminjaman-form .card-body {
@@ -105,6 +105,11 @@
     form.peminjaman-form .card-footer {
         padding: .9rem 1.75rem 1.1rem;
         border-top: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    body.sipkam-dark form.peminjaman-form .card-body,
+    body.sipkam-dark form.peminjaman-form .card-footer {
+        background: #020617;
     }
 
     /* SECTION pemecah form */
@@ -126,17 +131,17 @@
         display: flex;
         align-items: center;
         gap: .35rem;
-        color: #e5e7eb;
+        color: #0f172a;
     }
 
     .sipkam-section-title i {
         font-size: .8rem;
-        color: #e0e7ff;
+        color: #4f46e5;
     }
 
     .sipkam-section-subtitle {
         font-size: .82rem;
-        color: #e5e7f5;
+        color: #475569;
         margin-bottom: .75rem;
         opacity: .9;
     }
@@ -158,14 +163,14 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .06em;
-        color: #e5e7eb;
+        color: #0f172a;
     }
 
     form.peminjaman-form .form-select,
     form.peminjaman-form .form-control,
     form.peminjaman-form textarea {
         border-radius: 10px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #cbd5e1;
         font-size: .9rem;
         padding: .6rem .75rem;
         background-color: #ffffff;
@@ -191,8 +196,8 @@
     form.peminjaman-form .form-select:focus,
     form.peminjaman-form .form-control:focus,
     form.peminjaman-form textarea:focus {
-        border-color: #c7d2fe;
-        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.5);
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
     }
 
     body.sipkam-dark form.peminjaman-form .form-select:focus,

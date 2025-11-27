@@ -12,7 +12,7 @@
 
         {{-- HEADER GRADIENT --}}
         <div class="card-header border-0 py-3 px-4 d-flex justify-content-between align-items-center"
-             style="background: linear-gradient(90deg,#4F46E5,#22C55E,#FACC15);">
+             style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
             <div class="d-flex align-items-center gap-3">
                 <div class="bg-white rounded-circle d-flex align-items-center justify-content-center"
                      style="width:40px;height:40px;">

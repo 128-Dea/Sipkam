@@ -7,7 +7,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h1 class="h3 mb-1">Histori Transaksi</h1>
+        <h1 class="h3 mb-1">riwayat Transaksi</h1>
         <small class="text-muted">Arsip peminjaman yang sudah selesai</small>
     </div>
     <div class="d-flex gap-2">
@@ -39,7 +39,7 @@
 
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" id="histori-table">
+        <table class="table table-hover align-middle mb-0" id="riwayat-table">
             <thead class="table-light">
                 <tr>
                     <th>Nama Mahasiswa</th>
@@ -88,7 +88,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Belum ada histori.</td>
+                        <td colspan="7" class="text-center text-muted py-4">Belum ada riwayat.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -137,7 +137,7 @@
                     </div>
                     <div class="col-12">
                         <div class="p-3 rounded bg-white shadow-sm">
-                            <div class="fw-semibold text-muted">Catatan / Riwayat</div>
+                            <div class="fw-semibold text-muted">Catatan / riwayat</div>
                             <p class="mb-0" id="d-catatan"></p>
                         </div>
                     </div>

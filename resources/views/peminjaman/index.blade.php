@@ -157,7 +157,7 @@
                                             data-status="{{ ucfirst($item->status) }}"
                                             data-qr="{{ $item->qr->qr_code ?? '-' }}"
                                             data-qrpayload="{{ $item->qr->payload ?? '' }}"
-                                            data-riwayat="Peminjaman aktif. Riwayat perpanjangan: {{ $item->perpanjangan->count() }} kali. Keluhan: {{ $item->keluhan->count() }}.">
+                                            data-riwayat="Peminjaman aktif. riwayat perpanjangan: {{ $item->perpanjangan->count() }} kali. Keluhan: {{ $item->keluhan->count() }}.">
                                         Detail
                                     </button>
                                 </div>
@@ -222,7 +222,7 @@
                         </div>
                         <div class="col-12">
                             <div class="p-3 rounded border bg-white shadow-sm">
-                                <div class="fw-semibold mb-1">Riwayat Transaksi</div>
+                                <div class="fw-semibold mb-1">riwayat Transaksi</div>
                                 <p class="mb-0 text-muted" id="detail-riwayat"></p>
                             </div>
                         </div>
@@ -461,7 +461,7 @@
 
         .btn-peminjaman-primary {
             border-radius: 999px;
-            background: linear-gradient(90deg,#22c55e,#14b8a6);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             border: none;
             color: #ffffff;
             font-weight: 600;
@@ -471,7 +471,7 @@
             padding-inline: 1.1rem;
             padding-block: 0.55rem;
             font-size: 0.9rem;
-            box-shadow: 0 18px 35px rgba(16,185,129,0.35);
+            box-shadow: 0 18px 35px rgba(79,70,229,0.35);
         }
 
         .btn-peminjaman-primary:hover {
@@ -480,7 +480,7 @@
         }
 
         body.sipkam-dark .btn-peminjaman-primary {
-            box-shadow: 0 18px 45px rgba(34,197,94,0.5);
+            box-shadow: 0 18px 45px rgba(99,102,241,0.45);
         }
 
         .peminjaman-table thead th {

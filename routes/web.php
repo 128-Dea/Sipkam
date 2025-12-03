@@ -75,6 +75,8 @@ Route::middleware(['auth', 'role:petugas'])
 
         // Resource barang untuk petugas (tanpa index & show)
         Route::resource('barang', BarangController::class)->except(['index', 'show']);
+        Route::patch('barang/{id}/restore', [BarangController::class, 'restore'])->name('barang.restore');
+        Route::delete('barang/{id}/force', [BarangController::class, 'forceDestroy'])->name('barang.forceDestroy');
 
         // Manajemen stok cepat untuk petugas
         Route::patch('barang/{barang}/stok/tambah', [BarangController::class, 'stokTambah'])

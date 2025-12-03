@@ -6,7 +6,6 @@ use App\Models\Barang;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 class BarangController extends Controller
 {
@@ -15,9 +14,14 @@ class BarangController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        $isTrashView = $user && $user->role === 'petugas' && $request->boolean('trash');
 
         // Relasi dimuat supaya perhitungan stok otomatis tidak N+1 query
         $query = Barang::with(['kategori', 'peminjaman']);
+
+        if ($isTrashView) {
+            $query->onlyTrashed();
+        }
 
         // Pencarian nama / kode barang
         if ($search = $request->input('q')) {
@@ -49,7 +53,10 @@ class BarangController extends Controller
                 ->values();
         }
 
-        return view('barang.index', compact('barang'));
+        return view('barang.index', [
+            'barang'      => $barang,
+            'isTrashView' => $isTrashView,
+        ]);
     }
 
     public function create()
@@ -137,14 +144,32 @@ class BarangController extends Controller
 
     public function destroy(Barang $barang)
     {
-        if ($barang->foto_path) {
-            Storage::disk('public')->delete($barang->foto_path);
-        }
-
         // FK akan otomatis set null (melalui migration terbaru) sehingga riwayat tetap ada.
         $barang->delete();
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
+    }
+
+    public function restore(int $id)
+    {
+        $barang = Barang::withTrashed()->findOrFail($id);
+
+        $barang->restore();
+
+        return redirect()->route('barang.index', ['trash' => 1])->with('success', 'Barang berhasil dipulihkan');
+    }
+
+    public function forceDestroy(int $id)
+    {
+        $barang = Barang::withTrashed()->findOrFail($id);
+
+        if ($barang->foto_path) {
+            Storage::disk('public')->delete($barang->foto_path);
+        }
+
+        $barang->forceDelete();
+
+        return redirect()->route('barang.index', ['trash' => 1])->with('success', 'Barang dihapus permanen');
     }
 
     // ====== MANAJEMEN STOK CEPAT (PETUGAS) ======

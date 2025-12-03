@@ -4,6 +4,7 @@
     $isPetugasView = request()->routeIs('barang.index')
         && auth()->check()
         && auth()->user()->role === 'petugas';
+    $isTrashView = $isPetugasView && (($isTrashView ?? null) || request()->boolean('trash'));
 @endphp
 
 @section('content')
@@ -23,19 +24,33 @@
                     Dashboard /
                     <span class="text-dark fw-semibold">Manajemen Barang</span>
                 </p>
-                <h1 class="h4 mb-1 fw-bold text-dark">Manajemen Barang</h1>
+                <h1 class="h4 mb-1 fw-bold text-dark">
+                    {{ $isTrashView ? 'Sampah Barang' : 'Manajemen Barang' }}
+                </h1>
                 <small class="text-muted">
                     Kelola stok, status, dan detail barang inventaris kampus
                 </small>
             </div>
-            <a href="{{ route('petugas.barang.create') }}" class="btn btn-primary d-flex align-items-center shadow-sm">
-                <i class="fas fa-plus me-2"></i> Tambah Barang
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('barang.index', $isTrashView ? [] : ['trash' => 1]) }}"
+                   class="btn btn-outline-secondary d-flex align-items-center shadow-sm">
+                    <i class="fas fa-trash-restore me-2"></i>
+                    {{ $isTrashView ? 'Kembali ke daftar' : 'Lihat Sampah' }}
+                </a>
+                @unless($isTrashView)
+                    <a href="{{ route('petugas.barang.create') }}" class="btn btn-primary d-flex align-items-center shadow-sm">
+                        <i class="fas fa-plus me-2"></i> Tambah Barang
+                    </a>
+                @endunless
+            </div>
         </div>
 
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-0 pb-0">
                 <form method="GET" action="{{ route('barang.index') }}" class="row g-2 align-items-center">
+                    @if($isTrashView)
+                        <input type="hidden" name="trash" value="1">
+                    @endif
                     <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light border-0">
@@ -66,7 +81,8 @@
                     </div>
 
                     <div class="col-md-3 text-md-end small text-muted mt-2 mt-md-0">
-                        Total barang: <span class="fw-semibold">{{ $barang->count() }}</span>
+                        {{ $isTrashView ? 'Total di sampah' : 'Total barang' }}:
+                        <span class="fw-semibold">{{ $barang->count() }}</span>
                     </div>
                 </form>
             </div>
@@ -158,53 +174,80 @@
 
                                 {{-- AKSI --}}
                                 <td class="text-end">
-                                    <div class="btn-group btn-group-sm mb-1" role="group">
-                                        <a href="{{ route('barang.show', $item->id_barang) }}"
-                                           class="btn btn-light border">
-                                            <i class="fas fa-eye me-1"></i> Detail
-                                        </a>
-                                        <a href="{{ route('petugas.barang.edit', $item->id_barang) }}"
-                                           class="btn btn-light border">
-                                            <i class="fas fa-edit me-1"></i> Edit
-                                        </a>
-                                        <form action="{{ route('petugas.barang.destroy', $item->id_barang) }}"
-                                              method="POST"
-                                              class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="btn btn-light border text-danger"
-                                                    onclick="return confirm('Hapus barang ini?')">
-                                                <i class="fas fa-trash-alt me-1"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </div>
+                                    @if($isTrashView)
+                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                            <form action="{{ route('petugas.barang.restore', $item->id_barang) }}"
+                                                  method="POST"
+                                                  class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                        class="btn btn-light border text-success"
+                                                        onclick="return confirm('Pulihkan barang ini?')">
+                                                    <i class="fas fa-undo me-1"></i> Pulihkan
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('petugas.barang.forceDestroy', $item->id_barang) }}"
+                                                  method="POST"
+                                                  class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="btn btn-light border text-danger"
+                                                        onclick="return confirm('Hapus permanen barang ini beserta fotonya?')">
+                                                    <i class="fas fa-times me-1"></i> Hapus Permanen
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                            <a href="{{ route('barang.show', $item->id_barang) }}"
+                                               class="btn btn-light border">
+                                                <i class="fas fa-eye me-1"></i> Detail
+                                            </a>
+                                            <a href="{{ route('petugas.barang.edit', $item->id_barang) }}"
+                                               class="btn btn-light border">
+                                                <i class="fas fa-edit me-1"></i> Edit
+                                            </a>
+                                            <form action="{{ route('petugas.barang.destroy', $item->id_barang) }}"
+                                                  method="POST"
+                                                  class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="btn btn-light border text-danger"
+                                                        onclick="return confirm('Hapus barang ini? Data akan dipindahkan ke sampah.')">
+                                                    <i class="fas fa-trash-alt me-1"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </div>
 
-                                    {{-- Manajemen stok cepat (+1 / -1) --}}
-                                    <div class="d-flex justify-content-end gap-1">
-                                        <form action="{{ route('petugas.barang.stok.kurang', $item->id_barang) }}"
-                                              method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="jumlah" value="1">
-                                            <button class="btn btn-outline-secondary btn-sm px-2 py-0"
-                                                    type="submit"
-                                                    title="Kurangi stok total 1">
-                                                −
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('petugas.barang.stok.tambah', $item->id_barang) }}"
-                                              method="POST">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="hidden" name="jumlah" value="1">
-                                            <button class="btn btn-outline-secondary btn-sm px-2 py-0"
-                                                    type="submit"
-                                                    title="Tambah stok total 1">
-                                                +
-                                            </button>
-                                        </form>
-                                    </div>
+                                        {{-- Manajemen stok cepat (+1 / -1) --}}
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <form action="{{ route('petugas.barang.stok.kurang', $item->id_barang) }}"
+                                                  method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="jumlah" value="1">
+                                                <button class="btn btn-outline-secondary btn-sm px-2 py-0"
+                                                        type="submit"
+                                                        title="Kurangi stok total 1">
+                                                    -
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('petugas.barang.stok.tambah', $item->id_barang) }}"
+                                                  method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="jumlah" value="1">
+                                                <button class="btn btn-outline-secondary btn-sm px-2 py-0"
+                                                        type="submit"
+                                                        title="Tambah stok total 1">
+                                                    +
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
